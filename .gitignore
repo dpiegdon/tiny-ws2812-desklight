@@ -1,0 +1,10 @@
+*.o
+*.hex
+*.eep
+*.asm
+*.lst
+*.map
+*.elf
+*.bin
+*/*.swp
+*/.swp
