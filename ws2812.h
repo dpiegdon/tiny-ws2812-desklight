@@ -5,7 +5,7 @@
 #include <avr/cpufunc.h>
 #include <avr/io.h>
 
-#define PIN_LED		PB0
+#define PIN_LED PB0
 
 static inline void ws2812_init(void)
 {

@@ -6,5 +6,5 @@
 *.map
 *.elf
 *.bin
-*/*.swp
-*/.swp
+*.swp
+.swp
