@@ -15,9 +15,9 @@ static inline void sweep(void)
 {
 	for(uint8_t current = 1; current <= LIGHT_COUNT; ++current) {
 		ws2812_set(0,0,0, current - 1);
-		ws2812_set_single(128,0,0);
+		ws2812_set_single(255,0,0);
 		ws2812_set(0,0,0, LIGHT_COUNT - current);
-		_delay_us(2000);
+		_delay_us(3000);
 	}
 	ws2812_set(0,0,0, LIGHT_COUNT);
 }
