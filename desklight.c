@@ -23,7 +23,7 @@ static inline void sweep(void)
 }
 
 volatile uint8_t next_color = 0;
-volatile uint8_t current_brightness = 255;
+volatile uint8_t next_brightness = 255;
 
 uint8_t decode_colormask(uint8_t val) {
 	switch(val & 0b11U) {
@@ -64,7 +64,8 @@ uint8_t get_next_color(uint8_t current_color)
 
 int main(void)
 {
-	uint8_t old_brightness = 0;
+	uint8_t current_brightness = 0;
+	uint8_t current_attenuation = 0;
 	uint8_t current_color = 0b00000000U;
 	uint8_t current_r = 0;
 	uint8_t current_g = 0;
@@ -103,28 +104,31 @@ int main(void)
 		sleep_mode();
 		wdt_reset();
 
-
-		if(next_color || (old_brightness != current_brightness)) {
-			if(next_color) 
+		cli();
+		if(next_color || (current_brightness != next_brightness)) {
+			if(next_color) {
+				next_color = 0;
 				current_color = get_next_color(current_color);
+			}
 
-			/* fix brightness here */
-			current_r = decode_colormask((current_color >> 4));
-			current_g = decode_colormask((current_color >> 2));
-			current_b = decode_colormask((current_color >> 0));
+			if(current_brightness != next_brightness) {
+				current_brightness = next_brightness;
+				current_attenuation = current_brightness >> 4;
+			}
+
+			current_r = decode_colormask((current_color >> 4)) >> current_attenuation;
+			current_g = decode_colormask((current_color >> 2)) >> current_attenuation;
+			current_b = decode_colormask((current_color >> 0)) >> current_attenuation;
 
 			ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
-
-			next_color = 0;
-			old_brightness = current_brightness;
 		}
-
+		sei();
 	}
 }
 
 ISR(ADC_vect)
 {
-	current_brightness = ADCL;
+	next_brightness = ADCL;
 }
 
 ISR(PCINT0_vect)
