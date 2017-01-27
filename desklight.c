@@ -8,8 +8,8 @@
 
 #define LIGHT_COUNT 34
 
-#define PIN_POTENTIOMETER PB2
-#define PIN_SWITCH PB1
+#define PIN_POTENTIOMETER PB1
+#define PIN_SWITCH PB2
 
 static inline void sweep(void)
 {
@@ -85,7 +85,7 @@ int main(void)
 	PCMSK = (1 << PIN_SWITCH);
 	PCICR = (1 << PCIE0);
 	// enable ADC on potentiometer
-	ADMUX  = PIN_POTENTIOMETER;	// ADC uses PB2: ADC2
+	ADMUX  = PIN_POTENTIOMETER;	// select ADC pin
 	ADCSRA = (1 << ADEN)		// enable ADC circuit
 		|(1 << ADATE)		// enable ADC auto triggering
 		|(1 << ADIE)		// enable ADC interrupt

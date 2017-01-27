@@ -34,17 +34,18 @@ The firmware is written for an Atmel ATTiny10.
 Currently it uses more than 512B flash and an ADC, so it won't work on the
 smaller variants (4/5/9).
 
-Use a simple switch that pulls `PB1` (`PIN_SWITCH`) to ground when pressed.
-De-ring using a 100nF cap. NB: `PIN_SWITCH` uses the internal pullup.
+Use a simple switch that pulls `PIN_SWITCH` to ground when pressed. De-ring at
+the switch using a 100nF cap. NB: `PIN_SWITCH` uses the internal pullup.
 
 Connect a potentiometer with one end to VCC, the other to GND and the middle to
-`PB2` (`PIN_POTENTIOMETER`).
+`PIN_POTENTIOMETER`.
 
-Connect a strip of 34 (`LIGHT_COUNT`) WS2812 LEDs to `PB0` (`PIN_LED`).
+Connect a strip of 34 (`LIGHT_COUNT`) WS2812 LEDs to `PIN_LED`.
 
-To allow in-system programming (only with TPI interface if you are using
-ATTiny10), you might need to place a 1k resistor between switch and
-`PIN_SWITCH`. Otherwise the extra capacitance may break the TPI signalling.
+When using TPI related pins for inputs, take care to use e.g. a 1k resistor
+between the pin and the actual input signal, and connect TPI directly to the
+pin. This way TPI signal integrity is maintained. Otherwise you will not be able
+to program the chip in situ.
 
 
 TODO
@@ -56,11 +57,11 @@ TODO
 * Reduce idle powerconsumption by stepping down to 128KHz. Only use 8MHz during
   LED signalling.
 
-* Redesign to use `INT0` (`PB2`) for switch instead of `PB1`. This allows deeper
+* Redesign to use `INT0` for switch instead of `PCINT2`. This allows deeper
 sleep modes (no I/O clock required, can use ADC noise reduce).
 
 * Design small PCB.
 
-* For another project: build an H/S/V lamp with three potentiometers.
+* Idea for another project: build an H/S/V lamp with three potentiometers.
 
 
