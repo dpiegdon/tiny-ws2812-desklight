@@ -26,14 +26,14 @@ volatile uint8_t next_color = 0;
 volatile uint8_t current_brightness = 255;
 
 uint8_t decode_colormask(uint8_t val) {
-	switch(val & 0b11) {
-		case 0b11:
+	switch(val & 0b11U) {
+		case 0b11U:
 			return 255;
-		case 0b10:
+		case 0b10U:
 			return 170;
-		case 0b01:
+		case 0b01U:
 			return 85;
-		case 0b00:
+		case 0b00U:
 		default:
 			return 0;
 	};
@@ -41,30 +41,31 @@ uint8_t decode_colormask(uint8_t val) {
 
 uint8_t get_next_color(uint8_t current_color)
 {
-	switch(0b00111111 & current_color) {
-		case 0b00000000:
-			return 0b00111111;
-		case 0b00111111:
-			return 0b00110000;
-		case 0b00110000:
-			return 0b00111100;
-		case 0b00111100:
-			return 0b00001100;
-		case 0b00001100:
-			return 0b00001111;
-		case 0b00001111:
-			return 0b00000011;
-		case 0b00000011:
-			return 0b00110011;
-		case 0b00110011:
+	switch(0b00111111U & current_color) {
+		case 0b00000000U:
+			return 0b00111111U;
+		case 0b00111111U:
+			return 0b00110000U;
+		case 0b00110000U:
+			return 0b00111100U;
+		case 0b00111100U:
+			return 0b00001100U;
+		case 0b00001100U:
+			return 0b00001111U;
+		case 0b00001111U:
+			return 0b00000011U;
+		case 0b00000011U:
+			return 0b00110011U;
+		case 0b00110011U:
 		default:
-			return 0b00000000;
+			return 0b00000000U;
 	};
 }
 
 int main(void)
 {
-	uint8_t current_color = 0b00000000;
+	uint8_t old_brightness = 0;
+	uint8_t current_color = 0b00000000U;
 	uint8_t current_r = 0;
 	uint8_t current_g = 0;
 	uint8_t current_b = 0;
@@ -74,44 +75,57 @@ int main(void)
 
 	SMCR = 0; // set sleep-mode to idle (i/o clock required for PCI0)
 
-	PCMSK = (1 << PCINT1);
-	PCICR = (1 << PCIE0);
-
 	ws2812_init();
 
 	// prepare switch and potentiometer
 	DDRB &= ~((1 << PIN_POTENTIOMETER) | (1 << PIN_SWITCH));
 	PUEB = (1 << PIN_SWITCH);
+	// enable pin-change interrupt for switch
+	PCMSK = (1 << PIN_SWITCH);
+	PCICR = (1 << PCIE0);
+	// enable ADC on potentiometer
+	ADMUX  = PIN_POTENTIOMETER;	// ADC uses PB2: ADC2
+	ADCSRA = (1 << ADEN)		// enable ADC circuit
+		|(1 << ADATE)		// enable ADC auto triggering
+		|(1 << ADIE)		// enable ADC interrupt
+		|(0b111U);		// set ADC prescaler to /128
+		;
+	ADCSRB = 0;			// enable free running mode
 
-	///wdt_enable(0b0110U); // set watchdog timeout to 1s, enable reset.
 
 	sweep();
 
+	ADCSRA |= (1 << ADSC);		// ADC start conversions
+	wdt_enable(0b0110U); // set watchdog timeout to 1s, enable reset.
 	sei();
 
 	while(1) {
 		sleep_mode();
-		//wdt_reset();
+		wdt_reset();
 
-		//_delay_us(1000);
-		if(next_color) {
-			current_color = get_next_color(current_color);
+
+		if(next_color || (old_brightness != current_brightness)) {
+			if(next_color) 
+				current_color = get_next_color(current_color);
+
+			/* fix brightness here */
 			current_r = decode_colormask((current_color >> 4));
 			current_g = decode_colormask((current_color >> 2));
 			current_b = decode_colormask((current_color >> 0));
+
+			ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
+
 			next_color = 0;
+			old_brightness = current_brightness;
 		}
-		/* TODO fix brightness here */
-		ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
+
 	}
 }
 
-/*
 ISR(ADC_vect)
 {
-	
+	current_brightness = ADCL;
 }
-*/
 
 ISR(PCINT0_vect)
 {
