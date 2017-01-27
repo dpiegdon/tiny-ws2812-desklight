@@ -9,6 +9,10 @@
 #define LIGHT_COUNT 34
 
 #define PIN_POTENTIOMETER PB1
+
+// NOTE: if you change PIN_SWITCH to something else than PB2,
+// you can no longer use INT0 but PCINT*, and thus have to switch
+// to a lower sleep mode (IDLE instead of ADC-NOISEREDUCTION)
 #define PIN_SWITCH PB2
 
 static inline void sweep(void)
@@ -75,16 +79,16 @@ int main(void)
 	CCP = 0xD8; // allow writes to CLKPSR
 	CLKPSR = 0; // disable prescaler => 8MHz system clock
 
-	SMCR = 0; // set sleep-mode to idle (i/o clock required for PCI0)
+	SMCR = 1; // set sleep-mode to ADC noise reduction
 
 	ws2812_init();
 
 	// prepare switch and potentiometer
 	DDRB &= ~((1 << PIN_POTENTIOMETER) | (1 << PIN_SWITCH));
 	PUEB = (1 << PIN_SWITCH);
-	// enable pin-change interrupt for switch
-	PCMSK = (1 << PIN_SWITCH);
-	PCICR = (1 << PCIE0);
+	// enable interrupt for switch
+	EICRA = 0b10; // trigger INT0 on falling edge
+	EIMSK = 0b1; // enable INT0
 	// enable ADC on potentiometer
 	ADMUX  = PIN_POTENTIOMETER;	// select ADC pin
 	ADCSRA = (1 << ADEN)		// enable ADC circuit
@@ -93,7 +97,6 @@ int main(void)
 		|(0b111U);		// set ADC prescaler to /128
 		;
 	ADCSRB = 0;			// enable free running mode
-
 
 	sweep();
 
@@ -132,9 +135,8 @@ ISR(ADC_vect)
 	next_brightness = ADCL;
 }
 
-ISR(PCINT0_vect)
+ISR(INT0_vect)
 {
-	if(0 == (PINB & (1<<PIN_SWITCH)))
-		next_color = 1;
+	next_color = 1;
 }
 

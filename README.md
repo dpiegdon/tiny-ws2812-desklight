@@ -57,11 +57,7 @@ TODO
 * Reduce idle powerconsumption by stepping down to 128KHz. Only use 8MHz during
   LED signalling.
 
-* Redesign to use `INT0` for switch instead of `PCINT2`. This allows deeper
-sleep modes (no I/O clock required, can use ADC noise reduce).
-
 * Design small PCB.
 
 * Idea for another project: build an H/S/V lamp with three potentiometers.
-
 
