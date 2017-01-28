@@ -48,10 +48,8 @@ pin. This way TPI signal integrity is maintained. Otherwise you will not be able
 to program the chip in situ.
 
 
-TODO
-----
+Ideas for expansions
+--------------------
 
-* Design small PCB.
-
-* Idea for another project: build an H/S/V lamp with three potentiometers.
+* full H/S/V lamp with three potentiometers
 
