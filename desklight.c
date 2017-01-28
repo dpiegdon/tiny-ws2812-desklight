@@ -28,7 +28,23 @@ static inline void sweep(void)
 }
 
 volatile uint8_t next_color = 0;
-volatile uint8_t next_brightness = 255;
+volatile uint8_t next_attenuation = 0;
+
+void clock_slow(void)
+{
+	CCP = 0xD8; // allow writes to CLKPSR
+	CLKPSR = 0b0010U; // prescale with /4
+	CCP = 0xD8; // allow writes to CLKPSR
+	CLKMSR = 0b01U; // select internal 128khz WDT oscillator
+}
+
+void clock_fast(void)
+{
+	CCP = 0xD8; // allow writes to CLKPSR
+	CLKPSR = 0; // disable prescaler
+	CCP = 0xD8; // allow writes to CLKPSR
+	CLKMSR = 0b00U; // select internal 8MHz oscillator
+}
 
 uint8_t decode_colormask(uint8_t val) {
 	switch(val & 0b11U) {
@@ -69,15 +85,11 @@ uint8_t get_next_color(uint8_t current_color)
 
 int main(void)
 {
-	uint8_t current_brightness = 0;
 	uint8_t current_attenuation = 0;
 	uint8_t current_color = 0b00000000U;
 	uint8_t current_r = 0;
 	uint8_t current_g = 0;
 	uint8_t current_b = 0;
-
-	CCP = 0xD8; // allow writes to CLKPSR
-	CLKPSR = 0; // disable prescaler => 8MHz system clock
 
 	SMCR = 1; // set sleep-mode to ADC noise reduction
 
@@ -98,7 +110,9 @@ int main(void)
 		;
 	ADCSRB = 0;			// enable free running mode
 
+	clock_fast();
 	sweep();
+	clock_slow();
 
 	ADCSRA |= (1 << ADSC);		// ADC start conversions
 	wdt_enable(0b0110U); // set watchdog timeout to 1s, enable reset.
@@ -109,22 +123,20 @@ int main(void)
 		wdt_reset();
 
 		cli();
-		if(next_color || (current_brightness != next_brightness)) {
+		if(next_color || (current_attenuation != next_attenuation)) {
 			if(next_color) {
 				next_color = 0;
 				current_color = get_next_color(current_color);
 			}
-
-			if(current_brightness != next_brightness) {
-				current_brightness = next_brightness;
-				current_attenuation = current_brightness >> 4;
-			}
+			current_attenuation = next_attenuation;
 
 			current_r = decode_colormask((current_color >> 4)) >> current_attenuation;
 			current_g = decode_colormask((current_color >> 2)) >> current_attenuation;
 			current_b = decode_colormask((current_color >> 0)) >> current_attenuation;
 
+			clock_fast();
 			ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
+			clock_slow();
 		}
 		sei();
 	}
@@ -132,7 +144,7 @@ int main(void)
 
 ISR(ADC_vect)
 {
-	next_brightness = ADCL;
+	next_attenuation = ADCL >> 4;
 }
 
 ISR(INT0_vect)
