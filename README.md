@@ -51,9 +51,6 @@ to program the chip in situ.
 TODO
 ----
 
-* Improve brightness steps. Currently only 8 brightness steps exist,
-  each halfing the previous.
-
 * Design small PCB.
 
 * Idea for another project: build an H/S/V lamp with three potentiometers.

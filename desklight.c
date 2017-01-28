@@ -33,7 +33,7 @@ volatile uint8_t next_attenuation = 0;
 void clock_slow(void)
 {
 	CCP = 0xD8; // allow writes to CLKPSR
-	CLKPSR = 0b0010U; // prescale with /4
+	CLKPSR = 0b0001U; // prescale with /2
 	CCP = 0xD8; // allow writes to CLKPSR
 	CLKMSR = 0b01U; // select internal 128khz WDT oscillator
 }
@@ -46,7 +46,7 @@ void clock_fast(void)
 	CLKMSR = 0b00U; // select internal 8MHz oscillator
 }
 
-uint8_t decode_colormask(uint8_t val) {
+uint16_t decode_colormask(uint8_t val) {
 	switch(val & 0b11U) {
 		case 0b11U:
 			return 255;
@@ -58,6 +58,18 @@ uint8_t decode_colormask(uint8_t val) {
 		default:
 			return 0;
 	};
+}
+
+uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
+{
+	uint16_t val = decode_colormask(channelmask);
+
+	while(current_attenuation) {
+		val = val * 19 / 20;
+		--current_attenuation;
+	}
+
+	return val;
 }
 
 uint8_t get_next_color(uint8_t current_color)
@@ -106,7 +118,7 @@ int main(void)
 	ADCSRA = (1 << ADEN)		// enable ADC circuit
 		|(1 << ADATE)		// enable ADC auto triggering
 		|(1 << ADIE)		// enable ADC interrupt
-		|(0b111U);		// set ADC prescaler to /128
+		|(0b001U);		// set ADC prescaler to /2
 		;
 	ADCSRB = 0;			// enable free running mode
 
@@ -124,17 +136,16 @@ int main(void)
 
 		cli();
 		if(next_color || (current_attenuation != next_attenuation)) {
+			clock_fast();
 			if(next_color) {
 				next_color = 0;
 				current_color = get_next_color(current_color);
 			}
 			current_attenuation = next_attenuation;
 
-			current_r = decode_colormask((current_color >> 4)) >> current_attenuation;
-			current_g = decode_colormask((current_color >> 2)) >> current_attenuation;
-			current_b = decode_colormask((current_color >> 0)) >> current_attenuation;
-
-			clock_fast();
+			current_r = get_channel_brightness(current_color >> 4, current_attenuation);
+			current_g = get_channel_brightness(current_color >> 2, current_attenuation);
+			current_b = get_channel_brightness(current_color >> 0, current_attenuation);
 			ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
 			clock_slow();
 		}
@@ -144,7 +155,18 @@ int main(void)
 
 ISR(ADC_vect)
 {
-	next_attenuation = ADCL >> 4;
+	static uint16_t sample_sum = 0;
+	static uint8_t sample_count = 0;
+
+	sample_sum += ADCL;
+	sample_count += 1;
+
+	if(sample_count >= 8) {
+		// average over sample-count, also throw away lowest bit
+		next_attenuation = sample_sum / 8 >> 2;
+		sample_count = 0;
+		sample_sum = 0;
+	}
 }
 
 ISR(INT0_vect)
