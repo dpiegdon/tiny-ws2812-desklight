@@ -30,22 +30,26 @@ for more information.
 Hardware
 --------
 
+You can find a Kicad-based schematic in the hardware directory.
+
+Here is are a few notes:
+
 The firmware is written for an Atmel ATTiny10.
 Currently it uses more than 512B flash and an ADC, so it won't work on the
 smaller variants (4/5/9).
 
-Use a simple switch that pulls `PIN_SWITCH` to ground when pressed. De-ring at
-the switch using a 100nF cap. NB: `PIN_SWITCH` uses the internal pullup.
+A simple switch pulls `PIN_SWITCH` to ground when pressed. De-ringing is done
+with a 100nF cap. `PIN_SWITCH` uses the internal pullup.
 
-Connect a potentiometer with one end to VCC, the other to GND and the middle to
-`PIN_POTENTIOMETER`.
+A potentiometer is connected between GND and VCC. The center-tap is connected to
+a 10uF electrolytic cap (to smoothen the ADC value which seems very noisy at
+very low CLK frequencies of the atmel uC) and via 470 Ohm to the
+`PIN_POTENTIOMETER` for measurement by the ADC of the atmel uC. The resistor
+makes sure that TPI programming in situ is still possible.
 
-Connect a strip of 34 (`LIGHT_COUNT`) WS2812 LEDs to `PIN_LED`.
+A WS2812 RGB LED strip (of 34 LEDs) is connected to the `PIN_LED` line.
 
-When using TPI related pins for inputs, take care to use e.g. a 1k resistor
-between the pin and the actual input signal, and connect TPI directly to the
-pin. This way TPI signal integrity is maintained. Otherwise you will not be able
-to program the chip in situ.
+connect a 5V 1500mA (or better 2000mA) power supply for a strip with 34 LEDs.
 
 
 Ideas for expansions
