@@ -41,11 +41,10 @@ smaller variants (4/5/9).
 A simple switch pulls `PIN_SWITCH` to ground when pressed. De-ringing is done
 with a 100nF cap. `PIN_SWITCH` uses the internal pullup.
 
-A potentiometer is connected between GND and VCC. The center-tap is connected to
-a 10uF electrolytic cap (to smoothen the ADC value which seems very noisy at
-very low CLK frequencies of the atmel uC) and via 470 Ohm to the
-`PIN_POTENTIOMETER` for measurement by the ADC of the atmel uC. The resistor
-makes sure that TPI programming in situ is still possible.
+A potentiometer is connected between GND and VCC. The center-tap is connected
+via a 470 Ohm resistor to the `PIN_POTENTIOMETER` for measurement by the ADC of
+the atmel uC. The resistor makes sure that TPI programming in situ is still
+possible. `PIN_POTENTIOMETER` is debounced with a 10pF cap to GND.
 
 A WS2812 RGB LED strip (of 34 LEDs) is connected to the `PIN_LED` line.
 
