@@ -27,9 +27,6 @@ static inline void sweep(void)
 	ws2812_set(0,0,0, LIGHT_COUNT);
 }
 
-volatile uint8_t next_color = 0;
-volatile uint8_t next_attenuation = 0;
-
 void clock_slow(void)
 {
 	CCP = 0xD8; // allow writes to CLKPSR
@@ -46,7 +43,37 @@ void clock_fast(void)
 	CLKMSR = 0b00U; // select internal 8MHz oscillator
 }
 
-uint16_t decode_colormask(uint8_t val) {
+void setup_registers(void)
+{
+	SMCR = 1; // set sleep-mode to ADC noise reduction
+
+	ws2812_init();
+
+	// prepare switch and potentiometer
+	DDRB &= ~((1 << PIN_POTENTIOMETER) | (1 << PIN_SWITCH));
+	PUEB = (1 << PIN_SWITCH);
+	// enable interrupt for switch
+	EICRA = 0b10; // trigger INT0 on falling edge
+	EIMSK = 0b1; // enable INT0
+	// enable ADC on potentiometer
+	ADMUX  = PIN_POTENTIOMETER;	// select ADC pin
+	ADCSRA = (1 << ADEN)		// enable ADC circuit
+		|(1 << ADATE)		// enable ADC auto triggering
+		|(1 << ADIE)		// enable ADC interrupt
+		|(0b010U);		// set ADC prescaler to /4
+		;
+	ADCSRB = 0;			// enable free running mode
+
+	clock_fast();
+	sweep();
+	clock_slow();
+
+	ADCSRA |= (1 << ADSC);		// ADC start conversions
+	wdt_enable(0b0110U); // set watchdog timeout to 1s, enable reset.
+	sei();
+}
+
+static inline uint16_t decode_colormask(uint8_t val) {
 	switch(val & 0b11U) {
 		case 0b11U:
 			return 255;
@@ -60,12 +87,16 @@ uint16_t decode_colormask(uint8_t val) {
 	};
 }
 
-uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
+static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
 {
 	uint16_t val = decode_colormask(channelmask);
 
 	while(current_attenuation) {
-		val = val * 19 / 20;
+		// using no fractions at this point seems ok as flickering is
+		// no longer an issue here. only the linearity of the
+		// potentiometer is affected, while gaining the full
+		// spectrum of the potentiometer.
+		val = (val * 239) / 240;
 		--current_attenuation;
 	}
 
@@ -95,6 +126,9 @@ uint8_t get_next_color(uint8_t current_color)
 	};
 }
 
+static volatile uint8_t next_color = 0;
+static volatile uint16_t next_attenuation_5_3 = 0; // lower three bits are fractions
+
 int main(void)
 {
 	uint8_t current_attenuation = 0;
@@ -103,39 +137,16 @@ int main(void)
 	uint8_t current_g = 0;
 	uint8_t current_b = 0;
 
-	SMCR = 1; // set sleep-mode to ADC noise reduction
-
-	ws2812_init();
-
-	// prepare switch and potentiometer
-	DDRB &= ~((1 << PIN_POTENTIOMETER) | (1 << PIN_SWITCH));
-	PUEB = (1 << PIN_SWITCH);
-	// enable interrupt for switch
-	EICRA = 0b10; // trigger INT0 on falling edge
-	EIMSK = 0b1; // enable INT0
-	// enable ADC on potentiometer
-	ADMUX  = PIN_POTENTIOMETER;	// select ADC pin
-	ADCSRA = (1 << ADEN)		// enable ADC circuit
-		|(1 << ADATE)		// enable ADC auto triggering
-		|(1 << ADIE)		// enable ADC interrupt
-		|(0b001U);		// set ADC prescaler to /2
-		;
-	ADCSRB = 0;			// enable free running mode
-
-	clock_fast();
-	sweep();
-	clock_slow();
-
-	ADCSRA |= (1 << ADSC);		// ADC start conversions
-	wdt_enable(0b0110U); // set watchdog timeout to 1s, enable reset.
-	sei();
+	setup_registers();
 
 	while(1) {
 		sleep_mode();
 		wdt_reset();
 
 		cli();
+		uint8_t next_attenuation = (next_attenuation_5_3 >> 3) & 0xff;
 		if(next_color || (current_attenuation != next_attenuation)) {
+			ADCSRA &= ~(1 << ADSC); // stop ADC conversions
 			clock_fast();
 			if(next_color) {
 				next_color = 0;
@@ -148,25 +159,21 @@ int main(void)
 			current_b = get_channel_brightness(current_color >> 0, current_attenuation);
 			ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
 			clock_slow();
+			ADCSRA |= (1 << ADSC); // restart ADC conversions
 		}
 		sei();
 	}
 }
 
+
 ISR(ADC_vect)
 {
-	static uint16_t sample_sum = 0;
-	static uint8_t sample_count = 0;
-
-	sample_sum += ADCL;
-	sample_count += 1;
-
-	if(sample_count >= 8) {
-		// average over sample-count, also throw away lowest bit
-		next_attenuation = sample_sum / 8 >> 2;
-		sample_count = 0;
-		sample_sum = 0;
-	}
+	// simple exponential moving average IIR filter
+	// effectively this calculates: (average * 127/128 + newvalue * 1/127)
+	// remembers the three most significant fractions
+	// in the three least significant bits.
+	next_attenuation_5_3 = ( (next_attenuation_5_3 << 5) - next_attenuation_5_3
+			         + (((uint16_t)ADCL) << 3)) >> 5;
 }
 
 ISR(INT0_vect)
