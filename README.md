@@ -54,5 +54,7 @@ connect a 5V 1500mA (or better 2000mA) power supply for a strip with 34 LEDs.
 Ideas for expansions
 --------------------
 
+* allow using a rotary encoder for brightness ("digital potentiometer")
+
 * full H/S/V lamp with three potentiometers
 

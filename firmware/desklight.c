@@ -47,6 +47,8 @@ void setup_registers(void)
 {
 	SMCR = 1; // set sleep-mode to ADC noise reduction
 
+	PRR |= (1 << PRTIM0); // won't need the Timer0
+
 	ws2812_init();
 
 	// prepare switch and potentiometer
