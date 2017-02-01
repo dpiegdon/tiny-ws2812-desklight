@@ -39,7 +39,7 @@ erase:
 	avrdude ${AVRDUDE_OPTS} -e
 
 clean:
-	rm -f *.asm *.lst *.o *.map *.hex *.eep *.bin *.elf
+	rm -f *.asm *.lst *.o *.map *.hex *.eep *.bin *.elf *.su
 
 desklight.elf: desklight.o
 
