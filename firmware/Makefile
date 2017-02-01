@@ -11,7 +11,7 @@ CLOCK := 8000000UL
 CC := avr-gcc
 CFLAGS += -Wall -Werror -Wstrict-prototypes
 CFLAGS += -g -Os -mmcu=${MMCU} -DF_CPU=${CLOCK} -I.
-CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fstack-usage
 CFLAGS += -std=gnu99
 CFLAGS += -Wa,-adhlns=$(<:%.c=%.lst)
 

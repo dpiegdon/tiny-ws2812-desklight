@@ -12,6 +12,7 @@ firmware/*.lst
 firmware/*.map
 firmware/*.elf
 firmware/*.bin
+firmware/*.su
 firmware/emulated_*
 */*.swp
 */.swp
