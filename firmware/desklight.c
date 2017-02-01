@@ -48,6 +48,7 @@ void setup_registers(void)
 	SMCR = 1; // set sleep-mode to ADC noise reduction
 
 	PRR |= (1 << PRTIM0); // won't need the Timer0
+	DIDR0 = ~(1 << PIN_SWITCH); // disable all digital inputs but switch
 
 	ws2812_init();
 
