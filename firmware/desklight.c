@@ -33,50 +33,53 @@ static inline void setup_registers(void)
 	PCMSK |= (1 << PIN_SWITCH) | (1 << PIN_ROTARY1) | (1 << PIN_ROTARY2);
 }
 
+static volatile uint8_t next_io = (1 << PIN_SWITCH)
+				| (1 << PIN_ROTARY1)
+				| (1 << PIN_ROTARY2);
+
 int main(void)
 {
 	setup_registers();
 	calca_init();
 
+	uint8_t previous_io = (1 << PIN_SWITCH)
+				| (1 << PIN_ROTARY1)
+				| (1 << PIN_ROTARY2);
+
 	sei();
 
 	while(1) {
 		sleep_mode();
-		if(calca_values_changed())
+
+		uint8_t current_io = next_io;
+		uint8_t triggered = (current_io ^ previous_io);
+		if(triggered & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))) {
+			if(0 == (previous_io & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2)))) {
+				// rotary encoder upwards
+				if(0 == (current_io & (1 << PIN_ROTARY1)))
+					calca_rotary_up();
+
+				// rotary encoder downwards
+				if(0 == (current_io & (1 << PIN_ROTARY2)))
+					calca_rotary_down();
+			}
 			calca_set_new_values();
+		}
+
+		if(triggered & PIN_SWITCH) {
+			// encoder push-down
+			if(current_io & (1 << PIN_SWITCH))
+				calca_next();
+		}
+
+		previous_io = current_io;
 	}
 }
 
 ISR(PCINT0_vect)
 {
-	static uint8_t previous = (1 << PIN_SWITCH)
-				| (1 << PIN_ROTARY1)
-				| (1 << PIN_ROTARY2);
-
-	uint8_t  now  =  PINB & ( (1 << PIN_SWITCH)
+	next_io =  PINB & ( (1 << PIN_SWITCH)
 				| (1 << PIN_ROTARY1)
 				| (1 << PIN_ROTARY2));
-
-	uint8_t triggered = (now ^ previous);
-
-	if(triggered & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))) {
-		if(0 == (previous & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2)))) {
-			// rotary encoder upwards
-			if(0 == (now & (1 << PIN_ROTARY1)))
-				calca_rotary_up();
-
-			// rotary encoder downwards
-			if(0 == (now & (1 << PIN_ROTARY2)))
-				calca_rotary_down();
-		}
-	}
-
-	if(triggered & PIN_SWITCH) {
-		// encoder push-down
-		if(now & (1 << PIN_SWITCH))
-			calca_next();
-	}
-
-	previous = now;
 }
 

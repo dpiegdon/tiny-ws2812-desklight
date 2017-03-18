@@ -6,7 +6,7 @@
 
 #include <avr/interrupt.h>
 
-uint8_t decode_colormask(uint8_t mask)
+static inline uint8_t decode_colormask(uint8_t mask)
 {
 	switch(mask & 0b111U) {
 		case 0b000:
@@ -41,7 +41,6 @@ static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_atten
 	return val;
 }
 
-static volatile uint8_t calca_values_changed_flag = 0;
 static uint16_t calca_color = 0;
 static uint8_t calca_attenuation = 255;
 
@@ -55,7 +54,6 @@ static inline void calca_set_new_values(void)
 		// locked against race conditions with ISR
 		color = calca_color;
 		attenuation = calca_attenuation;
-		calca_values_changed_flag = 0;
 	}
 	sei();
 
@@ -76,11 +74,6 @@ static inline void calca_init(void)
 	ws2812_sweep();
 }
 
-static inline uint8_t calca_values_changed(void)
-{
-	return calca_values_changed_flag;
-}
-
 static uint8_t calca_choose_color = 0;
 
 static inline void calca_next(void)
@@ -94,8 +87,6 @@ static inline void calca_rotary_up(void)
 		calca_color += 1;
 	else if(calca_attenuation < 255)
 			calca_attenuation += 1;
-
-	calca_values_changed_flag = 1;
 }
 
 static inline void calca_rotary_down(void)
@@ -104,8 +95,6 @@ static inline void calca_rotary_down(void)
 		calca_color -= 1;
 	else if(calca_attenuation > 0)
 			calca_attenuation -= 1;
-
-	calca_values_changed_flag = 1;
 }
 
 #endif // __CALCA_H__
