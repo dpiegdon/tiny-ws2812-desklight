@@ -11,6 +11,8 @@
 
 #define PIN_LED PB0
 
+#define LIGHT_COUNT 34
+
 static inline void ws2812_init(void)
 {
 	DDRB |= (1 << PIN_LED);

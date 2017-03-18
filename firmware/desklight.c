@@ -4,16 +4,9 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
-#define LIGHT_COUNT 34
-
 #define PIN_ROTARY1	PB1
-#define ISR_ROTARY1	PCINT2_vect
-
 #define PIN_ROTARY2	PB2
-#define ISR_ROTARY2	PCINT2_vect
-
 #define PIN_SWITCH	PB3
-#define ISR_SWITCH	PCINT3_vect
 
 void setup_registers(void)
 {
@@ -31,15 +24,14 @@ void setup_registers(void)
 	// enable interrupt for switch and rotary encoder flags
 	PCICR |= PCIE0;
 	PCMSK |= (1 << PIN_SWITCH) | (1 << PIN_ROTARY1) | (1 << PIN_ROTARY2);
-
-	ws2812_sweep();
-
-	sei();
 }
 
 int main(void)
 {
 	setup_registers();
+	calca_init();
+
+	sei();
 
 	while(1) {
 		sleep_mode();
@@ -48,27 +40,33 @@ int main(void)
 	}
 }
 
-ISR(ISR_ROTARY1, ISR_ALIASOF(ISR_ROTARY2));
-ISR(ISR_ROTARY2)
+ISR(PCINT0_vect)
 {
-	static uint8_t previous = (1 << PIN_ROTARY1) | (1 << PIN_ROTARY2);
-	uint8_t now = PINB & ((1 << PIN_ROTARY1) | (1 << PIN_ROTARY2));
+	static uint8_t previous = (1 << PIN_SWITCH)
+				| (1 << PIN_ROTARY1)
+				| (1 << PIN_ROTARY2);
 
-	if(0 == previous)
-	{
-		if(0 == (now & (1 << PIN_ROTARY1)))
-			calca_up();
-		if(0 == (now & (1 << PIN_ROTARY2)))
-			calca_down();
+	uint8_t  now  =  PINB & ( (1 << PIN_SWITCH)
+				| (1 << PIN_ROTARY1)
+				| (1 << PIN_ROTARY2));
+
+	uint8_t triggered = now ^ previous;
+
+	if(triggered & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))) {
+		if(0 == (previous & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2)))) {
+			if(0 == (now & (1 << PIN_ROTARY1)))
+				calca_rotary(1);
+			if(0 == (now & (1 << PIN_ROTARY2)))
+				calca_rotary(0);
+		}
+	}
+
+	if(triggered & PIN_SWITCH) {
+		// encoder push-down
+		if(now & (1 << PIN_SWITCH))
+			calca_next();
 	}
 
 	previous = now;
-}
-
-ISR(ISR_SWITCH)
-{
-	// encoder push-down
-	if(PINB & (1 << PIN_SWITCH))
-		calca_next();
 }
 

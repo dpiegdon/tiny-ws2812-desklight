@@ -5,19 +5,29 @@
 #include "clock.h"
 #include "ws2812.h"
 
-static inline uint16_t decode_colormask(uint8_t val)
+#include <avr/interrupt.h>
+
+static uint8_t decode_colormask(uint8_t mask)
 {
-	switch(val & 0b11U) {
-		case 0b11U:
-			return 255;
-		case 0b10U:
-			return 170;
-		case 0b01U:
-			return 85;
-		case 0b00U:
-		default:
+	switch(mask & 0b111U) {
+		case 0b000:
 			return 0;
-	};
+		case 0b001:
+			return 36;
+		case 0b010:
+			return 73;
+		case 0b011:
+			return 109;
+		case 0b100:
+			return 146;
+		case 0b101:
+			return 182;
+		case 0b110:
+			return 219;
+		default:
+		case 0b111:
+			return 255;
+	}
 }
 
 static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
@@ -32,54 +42,36 @@ static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_atten
 	return val;
 }
 
-uint8_t get_next_color(uint8_t current_color)
-{
-	switch(0b00111111U & current_color) {
-		case 0b00000000U:
-			return 0b00111111U;
-		case 0b00111111U:
-			return 0b00110000U;
-		case 0b00110000U:
-			return 0b00111100U;
-		case 0b00111100U:
-			return 0b00001100U;
-		case 0b00001100U:
-			return 0b00001111U;
-		case 0b00001111U:
-			return 0b00000011U;
-		case 0b00000011U:
-			return 0b00110011U;
-		case 0b00110011U:
-		default:
-			return 0b00000000U;
-	};
-}
-
-static volatile uint8_t calca_values_changed_flag;
-static volatile uint8_t next_color = 0;
-static volatile uint16_t next_attenuation_5_3 = 0; // lower three bits are fractions
+static volatile uint8_t calca_values_changed_flag = 0;
+static uint16_t calca_color = 0;
+static uint8_t calca_brightness = 255;
 
 static inline void calca_set_new_values(void)
 {
-	cli();
-	uint8_t next_attenuation = (next_attenuation_5_3 >> 3) & 0xff;
-	if(next_color || (current_attenuation != next_attenuation)) {
-		ADCSRA &= ~(1 << ADSC); // stop ADC conversions
-		clock_fast();
-		if(next_color) {
-			next_color = 0;
-			current_color = get_next_color(current_color);
-		}
-		current_attenuation = next_attenuation;
+	uint8_t brightness;
+	uint16_t color;
 
-		current_r = get_channel_brightness(current_color >> 4, current_attenuation);
-		current_g = get_channel_brightness(current_color >> 2, current_attenuation);
-		current_b = get_channel_brightness(current_color >> 0, current_attenuation);
-		ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
-		clock_slow();
-		ADCSRA |= (1 << ADSC); // restart ADC conversions
+	cli(); // so we don't need volatile for more vars, also prevents race condition
+	{
+		// also only copying values to local improves responsiveness, as
+		// interrupts can trigger during new generation of values
+		calca_values_changed_flag = 0;
+		color = calca_color;
+		brightness = calca_brightness;
 	}
 	sei();
+
+	clock_fast();
+	uint8_t current_r = get_channel_brightness(color >> 6, brightness);
+	uint8_t current_g = get_channel_brightness(color >> 3, brightness);
+	uint8_t current_b = get_channel_brightness(color >> 0, brightness);
+	cli();
+	{
+		// timing critical, interrupts may interfere
+		ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
+	}
+	sei();
+	clock_slow();
 }
 
 static inline void calca_init(void)
@@ -93,19 +85,31 @@ static inline uint8_t calca_values_changed(void)
 	return calca_values_changed_flag;
 }
 
+static uint8_t calca_chose_color=0;
+
 void calca_next(void)
 {
-	
+	calca_chose_color += 1;
 }
 
-void calca_up(void)
+void calca_rotary(uint8_t up)
 {
-	
-}
+	if(calca_chose_color) {
+		if(up)
+			calca_color += 1;
+		else
+			calca_color -= 1;
+	} else {
+		if(up) {
+			if(calca_brightness < 255)
+				calca_brightness += 1;
+		} else {
+			if(calca_brightness > 0)
+				calca_brightness -= 1;
+		}
+	}
 
-void calca_down(void)
-{
-	
+	calca_values_changed_flag = 1;
 }
 
 #endif // __CALCA_H__
