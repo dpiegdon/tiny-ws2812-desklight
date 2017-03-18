@@ -2,8 +2,6 @@
 #ifndef __WS2812_H__
 # define __WS2812_H__
 
-#include "clock.h"
-
 #include <stdint.h>
 #include <avr/cpufunc.h>
 #include <avr/io.h>
@@ -60,7 +58,6 @@ static inline void ws2812_set(uint8_t r, uint8_t g, uint8_t b, uint8_t count)
 
 static inline void ws2812_sweep(void)
 {
-	clock_fast();
 	_delay_us(3000);
 	for(uint8_t current = 1; current <= LIGHT_COUNT; ++current) {
 		ws2812_set(0,0,0, current - 1);
@@ -69,7 +66,6 @@ static inline void ws2812_sweep(void)
 		_delay_us(3000);
 	}
 	ws2812_set(0,0,0, LIGHT_COUNT);
-	clock_slow();
 }
 
 #endif // __WS2812_H__

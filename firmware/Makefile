@@ -43,7 +43,7 @@ clean:
 
 desklight.elf: desklight.o
 
-desklight.o: desklight.c calca.h ws2812.h clock.h
+desklight.o: desklight.c calca.h ws2812.h
 
 %.elf:
 	$(CC) $(LDFLAGS) $^ -o $@
