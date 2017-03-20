@@ -44,43 +44,26 @@ static uint8_t calca_attenuation;
 
 static void calca_set_new_values(void)
 {
-	uint8_t attenuation;
-	uint16_t color;
-
-	cli();
-	{
-		// locked against race conditions with ISR
-		color = calca_color;
-		attenuation = calca_attenuation;
-	}
-	sei();
-
-	uint8_t current_r = get_channel_brightness(color >> 0, attenuation);
-	uint8_t current_g = get_channel_brightness(color >> 2, attenuation);
-	uint8_t current_b = get_channel_brightness(color >> 4, attenuation);
-	cli();
-	{
-		// timing critical, interrupts may interfere
-		ws2812_set(current_r, current_g, current_b, LIGHT_COUNT);
-	}
-	sei();
+	ws2812_set( get_channel_brightness(calca_color >> 0, calca_attenuation),
+		    get_channel_brightness(calca_color >> 2, calca_attenuation),
+		    get_channel_brightness(calca_color >> 4, calca_attenuation),
+		    LIGHT_COUNT );
 }
 
-static void calca_reset(void)
+static void calca_init(void)
 {
-	ws2812_sweep();
+	cli();
+	{
+		ws2812_init();
+		ws2812_sweep();
 
-	calca_choose_color = 0;
-	calca_color = 0b11;
-	calca_attenuation = MAX_ATTENUATION;
+		calca_choose_color = 0;
+		calca_color = 0b11;
+		calca_attenuation = MAX_ATTENUATION;
 
-	calca_set_new_values();
-}
-
-static inline void calca_init(void)
-{
-	ws2812_init();
-	calca_reset();
+		calca_set_new_values();
+	}
+	sei();
 }
 
 static inline void calca_next(void)
@@ -97,7 +80,11 @@ static inline void calca_rotary_up(void)
 	else
 		return;
 
-	calca_set_new_values();
+	cli();
+	{
+		calca_set_new_values();
+	}
+	sei();
 }
 
 static inline void calca_rotary_down(void)
@@ -109,7 +96,11 @@ static inline void calca_rotary_down(void)
 	else
 		return;
 
-	calca_set_new_values();
+	cli();
+	{
+		calca_set_new_values();
+	}
+	sei();
 }
 
 #endif // __CALCA_H__

@@ -40,18 +40,19 @@ static volatile uint8_t next_io = (1 << PIN_SWITCH)
 int main(void)
 {
 	setup_registers();
-	calca_init();
+	calca_init(); // activates interrupts
 	uint8_t previous_io = (1 << PIN_SWITCH)
 				| (1 << PIN_ROTARY1)
 				| (1 << PIN_ROTARY2);
 
-	sei();
-
 	while(1) {
 		sleep_mode();
 
-		uint8_t current_io = next_io;
+		uint8_t current_io = next_io &  ( (1 << PIN_ROTARY1)
+						| (1 << PIN_ROTARY2)
+						| (1 << PIN_SWITCH) );
 		uint8_t triggered = (current_io ^ previous_io);
+
 		if(triggered & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))) {
 			if(0 == (previous_io & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2)))) {
 				// rotary encoder upwards
@@ -78,7 +79,7 @@ int main(void)
 			} else {
 				if(TCNT0 > 2604) {
 					// pressed for more than ~1/3 second
-					calca_reset();
+					calca_init();
 				}
 				PRR |= (1 << PRTIM0);
 			}
@@ -90,8 +91,6 @@ int main(void)
 
 ISR(PCINT0_vect)
 {
-	next_io =  PINB & ( (1 << PIN_SWITCH)
-				| (1 << PIN_ROTARY1)
-				| (1 << PIN_ROTARY2));
+	next_io = PINB;
 }
 
