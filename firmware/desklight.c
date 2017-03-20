@@ -33,10 +33,6 @@ static inline void setup_registers(void)
 	PCMSK |= (1 << PIN_SWITCH) | (1 << PIN_ROTARY1) | (1 << PIN_ROTARY2);
 }
 
-static volatile uint8_t next_io = (1 << PIN_SWITCH)
-				| (1 << PIN_ROTARY1)
-				| (1 << PIN_ROTARY2);
-
 int main(void)
 {
 	setup_registers();
@@ -48,9 +44,9 @@ int main(void)
 	while(1) {
 		sleep_mode();
 
-		uint8_t current_io = next_io &  ( (1 << PIN_ROTARY1)
-						| (1 << PIN_ROTARY2)
-						| (1 << PIN_SWITCH) );
+		uint8_t current_io = PINB & ( (1 << PIN_ROTARY1)
+					  | (1 << PIN_ROTARY2)
+					  | (1 << PIN_SWITCH) );
 		uint8_t triggered = (current_io ^ previous_io);
 
 		if(triggered & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))) {
@@ -90,7 +86,5 @@ int main(void)
 }
 
 ISR(PCINT0_vect)
-{
-	next_io = PINB;
-}
+{ }
 
