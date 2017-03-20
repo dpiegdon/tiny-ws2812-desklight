@@ -86,5 +86,5 @@ int main(void)
 }
 
 ISR(PCINT0_vect)
-{ }
+{ /* this just pulls us out of sleep mode */ }
 
