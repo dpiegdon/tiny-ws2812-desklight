@@ -84,6 +84,8 @@ static inline void calca_rotary_up(void)
 		calca_color += 1;
 	else if(calca_attenuation > 0)
 		calca_attenuation -= 1;
+	else
+		return;
 
 	calca_set_new_values();
 }
@@ -94,6 +96,8 @@ static inline void calca_rotary_down(void)
 		calca_color -= 1;
 	else if(calca_attenuation < MAX_ATTENUATION)
 		calca_attenuation += 1;
+	else
+		return;
 
 	calca_set_new_values();
 }
