@@ -29,7 +29,7 @@ static inline void setup_registers(void)
 	PUEB = (1 << PIN_SWITCH) | (1 << PIN_ROTARY1) | (1 << PIN_ROTARY2);
 
 	// enable interrupt for switch and rotary encoder flags
-	PCICR |= PCIE0;
+	PCICR |= (1 << PCIE0);
 	PCMSK |= (1 << PIN_SWITCH) | (1 << PIN_ROTARY1) | (1 << PIN_ROTARY2);
 }
 
@@ -41,7 +41,6 @@ int main(void)
 {
 	setup_registers();
 	calca_init();
-
 	uint8_t previous_io = (1 << PIN_SWITCH)
 				| (1 << PIN_ROTARY1)
 				| (1 << PIN_ROTARY2);
@@ -63,7 +62,6 @@ int main(void)
 				if(0 == (current_io & (1 << PIN_ROTARY2)))
 					calca_rotary_down();
 			}
-			calca_set_new_values();
 		}
 
 		if(triggered & PIN_SWITCH) {

@@ -6,26 +6,23 @@
 
 #include <avr/interrupt.h>
 
-static inline uint8_t decode_colormask(uint8_t mask)
+#define ATTENUATION(x) ( (x) * 15 / 16 )
+// given the above formula using integers, there are this many
+// attenuations that are distinct (plus one, which is NO attenuation '0')
+#define MAX_ATTENUATION 53
+
+static inline uint16_t decode_colormask(uint8_t mask)
 {
 	switch(mask & 0b111U) {
-		case 0b000:
-			return 0;
-		case 0b001:
-			return 36;
-		case 0b010:
-			return 73;
-		case 0b011:
-			return 109;
-		case 0b100:
-			return 146;
-		case 0b101:
-			return 182;
-		case 0b110:
-			return 219;
+		case 0b00:
+			return 0U;
+		case 0b01:
+			return 85U;
+		case 0b10:
+			return 170U;
 		default:
-		case 0b111:
-			return 255;
+		case 0b11:
+			return 255U;
 	}
 }
 
@@ -34,17 +31,17 @@ static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_atten
 	uint16_t val = decode_colormask(channelmask);
 
 	while(current_attenuation) {
-		val = (val * 239) / 240;
+		val = ATTENUATION(val);
 		--current_attenuation;
 	}
 
 	return val;
 }
 
-static uint16_t calca_color = 0;
-static uint8_t calca_attenuation = 255;
+static uint16_t calca_color = 0xffff;
+static uint8_t calca_attenuation = 0;
 
-static inline void calca_set_new_values(void)
+static void calca_set_new_values(void)
 {
 	uint8_t attenuation;
 	uint16_t color;
@@ -57,9 +54,9 @@ static inline void calca_set_new_values(void)
 	}
 	sei();
 
-	uint8_t current_r = get_channel_brightness(color >> 6, attenuation);
-	uint8_t current_g = get_channel_brightness(color >> 3, attenuation);
-	uint8_t current_b = get_channel_brightness(color >> 0, attenuation);
+	uint8_t current_r = get_channel_brightness(color >> 0, attenuation);
+	uint8_t current_g = get_channel_brightness(color >> 2, attenuation);
+	uint8_t current_b = get_channel_brightness(color >> 4, attenuation);
 	cli();
 	{
 		// timing critical, interrupts may interfere
@@ -85,16 +82,20 @@ static inline void calca_rotary_up(void)
 {
 	if(calca_choose_color)
 		calca_color += 1;
-	else if(calca_attenuation < 255)
-			calca_attenuation += 1;
+	else if(calca_attenuation > 0)
+		calca_attenuation -= 1;
+
+	calca_set_new_values();
 }
 
 static inline void calca_rotary_down(void)
 {
 	if(calca_choose_color)
 		calca_color -= 1;
-	else if(calca_attenuation > 0)
-			calca_attenuation -= 1;
+	else if(calca_attenuation < MAX_ATTENUATION)
+		calca_attenuation += 1;
+
+	calca_set_new_values();
 }
 
 #endif // __CALCA_H__
