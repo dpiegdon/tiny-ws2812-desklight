@@ -71,7 +71,7 @@ static void calca_reset(void)
 	ws2812_sweep();
 
 	calca_choose_color = 0;
-	calca_color = 0xffff;
+	calca_color = 0b11;
 	calca_attenuation = MAX_ATTENUATION;
 
 	calca_set_new_values();
