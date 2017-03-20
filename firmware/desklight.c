@@ -64,7 +64,7 @@ int main(void)
 			}
 		}
 
-		if(triggered & PIN_SWITCH) {
+		if(triggered & (1 << PIN_SWITCH)) {
 			// encoder push-down
 			if(current_io & (1 << PIN_SWITCH))
 				calca_next();
