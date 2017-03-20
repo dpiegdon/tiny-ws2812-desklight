@@ -13,13 +13,13 @@
 
 static inline uint16_t decode_colormask(uint8_t mask)
 {
-	switch(mask & 0b111U) {
+	switch(mask & 0b11U) {
 		case 0b00:
 			return 0U;
 		case 0b01:
-			return 85U;
+			return 64U;
 		case 0b10:
-			return 170U;
+			return 128U;
 		default:
 		case 0b11:
 			return 255U;
@@ -38,8 +38,9 @@ static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_atten
 	return val;
 }
 
-static uint16_t calca_color = 0xffff;
-static uint8_t calca_attenuation = 0;
+static uint8_t calca_choose_color;
+static uint16_t calca_color;
+static uint8_t calca_attenuation;
 
 static void calca_set_new_values(void)
 {
@@ -65,17 +66,26 @@ static void calca_set_new_values(void)
 	sei();
 }
 
+static void calca_reset(void)
+{
+	ws2812_sweep();
+
+	calca_choose_color = 0;
+	calca_color = 0xffff;
+	calca_attenuation = MAX_ATTENUATION;
+
+	calca_set_new_values();
+}
+
 static inline void calca_init(void)
 {
 	ws2812_init();
-	ws2812_sweep();
+	calca_reset();
 }
-
-static uint8_t calca_choose_color = 0;
 
 static inline void calca_next(void)
 {
-	calca_choose_color ^= 1;
+	calca_choose_color = !calca_choose_color;
 }
 
 static inline void calca_rotary_up(void)

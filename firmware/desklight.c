@@ -15,7 +15,7 @@ static inline void setup_registers(void)
 	CCP = 0xD8;		// allow writes to CLKPSR
 	CLKMSR = 0b00U;		// select internal 8MHz oscillator
 
-	// set sleep-mode to idle FIXME: how deep can we go? power-down?
+	// set sleep-mode to idle
 	SMCR = 0;
 
 	// won't need the Timer0 or ADC
@@ -66,8 +66,22 @@ int main(void)
 
 		if(triggered & (1 << PIN_SWITCH)) {
 			// encoder push-down
-			if(current_io & (1 << PIN_SWITCH))
+			if(0 == (current_io & (1 << PIN_SWITCH))) {
 				calca_next();
+				// start timer0 for measurement of time
+				// until button-release
+				PRR &= ~(1 << PRTIM0);
+				TCCR0A = 0;
+				TCCR0C = 0;
+				TCCR0B = 0b00000101; // TimerCLK is IoCLK/1024
+				TCNT0 = 0;
+			} else {
+				if(TCNT0 > 2604) {
+					// pressed for more than ~1/3 second
+					calca_reset();
+				}
+				PRR |= (1 << PRTIM0);
+			}
 		}
 
 		previous_io = current_io;

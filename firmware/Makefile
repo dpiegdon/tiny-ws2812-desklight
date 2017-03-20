@@ -27,8 +27,7 @@ readfuses:
 	avrdude ${AVRDUDE_OPTS} -Ulfuse:r:fuse_low.hex:h -U hfuse:r:fuse_high.hex:h
 
 fuses_desklight:
-	#avrdude ${AVRDUDE_OPTS} -U fuse:w:0xFF:m
-	true
+	avrdude ${AVRDUDE_OPTS} -U fuse:w:0xFE:m
 
 prog_flash_desklight: desklight.hex fuses_desklight
 	avrdude ${AVRDUDE_OPTS} -U flash:w:desklight.hex
