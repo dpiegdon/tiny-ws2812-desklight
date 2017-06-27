@@ -1,8 +1,8 @@
 <!-- vim: fo=a tw=80 colorcolumn=80 syntax=markdown :
 -->
 
-WS2812 desklight
-================
+ATTiny10-powered WS2812 desklight
+=================================
 
 Controller firmware and hardware for a very simple desklight that has
 one button to cycle through a palette of colors
