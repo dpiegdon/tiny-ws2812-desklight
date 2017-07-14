@@ -45,8 +45,8 @@ int main(void)
 		sleep_mode();
 
 		uint8_t current_io = PINB & ( (1 << PIN_ROTARY1)
-					  | (1 << PIN_ROTARY2)
-					  | (1 << PIN_SWITCH) );
+					    | (1 << PIN_ROTARY2)
+					    | (1 << PIN_SWITCH) );
 		uint8_t triggered = (current_io ^ previous_io);
 
 		if(triggered & ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))) {
