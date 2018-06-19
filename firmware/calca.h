@@ -11,41 +11,27 @@
 // attenuations that are distinct (plus one, which is NO attenuation '0')
 #define MAX_ATTENUATION 53
 
-static inline uint16_t decode_colormask(uint8_t mask)
+static inline uint8_t decode_colormask(uint8_t mask)
 {
-	switch(mask & 0x3U) {
-		case 0x0:
-			return 0U;
-		case 0x1:
-			return 64U;
-		case 0x2:
-			return 128U;
-		default:
-		case 0x3:
-			return 255U;
-	}
+	static const uint8_t brightness_map[4] = {0, 64, 128, 255};
+	return brightness_map[mask&3];
 }
 
 static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
 {
 	uint16_t val = decode_colormask(channelmask);
-
-	while(current_attenuation) {
+	while(current_attenuation--)
 		val = ATTENUATION(val);
-		--current_attenuation;
-	}
-
 	return val;
 }
 
-__attribute__((unused)) enum {
+enum calca_modes {
 	MODE_ATTENUATION = 0,
 	MODE_COLOR = 1,
 	MODE_SPOTWIDTH = 2,
 	MODE_SPOTPOS = 3,
 	MODECOUNT = 4,
-} calca_modes;
-
+};
 
 static uint8_t calca_mode;
 static uint16_t calca_color;
@@ -91,7 +77,8 @@ static void calca_init(void)
 
 static inline void calca_next(void)
 {
-	calca_mode = (calca_mode + 1) % MODECOUNT;
+	calca_mode++;
+	calca_mode %= MODECOUNT;
 }
 
 static inline void calca_rotary_up(void)
@@ -108,12 +95,11 @@ static inline void calca_rotary_up(void)
 			if(LIGHT_COUNT > calca_pos + calca_oncount)
 				calca_oncount += 1;
 			break;
+		default:
 		case MODE_SPOTPOS:
 			if(LIGHT_COUNT > calca_pos + calca_oncount)
 				calca_pos += 1;
 			break;
-		default:
-			return;
 	};
 
 	cli();
@@ -137,12 +123,11 @@ static inline void calca_rotary_down(void)
 			if(calca_oncount > 0)
 				calca_oncount -= 1;
 			break;
+		default:
 		case MODE_SPOTPOS:
 			if(calca_pos > 0)
 				calca_pos -= 1;
 			break;
-		default:
-			return;
 	};
 
 
