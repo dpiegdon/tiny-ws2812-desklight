@@ -35,14 +35,14 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title "WS2812-based desktop lamp"
-Date "2017-01-28"
-Rev ""
+Title "tiny-ws2812-desklight"
+Date "2018-06-19"
+Rev "v1.0"
 Comp ""
-Comment1 "David R. Piegdon"
-Comment2 "<dgit@piegdon.de>"
-Comment3 ""
-Comment4 ""
+Comment1 "<dgit@piegdon.de>"
+Comment2 "David R. Piegdon"
+Comment3 "github.com/dpiegdon/tiny-ws2812-desklight"
+Comment4 "WS2812-based desktop lamp"
 $EndDescr
 $Comp
 L ATTINY10-TS IC1
@@ -363,9 +363,13 @@ $EndComp
 Wire Wire Line
 	9500 3700 9700 3700
 Wire Wire Line
-	9700 3550 9700 3800
+	9700 3550 9700 3700
 Wire Wire Line
-	9700 4100 9700 4350
+	9700 3700 9700 3800
+Wire Wire Line
+	9700 4100 9700 4200
+Wire Wire Line
+	9700 4200 9700 4350
 Wire Wire Line
 	9700 4200 9500 4200
 Connection ~ 9700 3700
@@ -407,9 +411,13 @@ Wire Wire Line
 Wire Wire Line
 	1600 2100 1600 2200
 Wire Wire Line
-	1250 2200 1900 2200
+	1250 2200 1600 2200
 Wire Wire Line
-	1250 2300 1900 2300
+	1600 2200 1900 2200
+Wire Wire Line
+	1250 2300 1600 2300
+Wire Wire Line
+	1600 2300 1900 2300
 Wire Wire Line
 	5000 4500 5250 4500
 Wire Wire Line
@@ -423,11 +431,17 @@ Wire Wire Line
 Wire Wire Line
 	4150 4400 4150 5000
 Wire Wire Line
-	5450 4100 5450 4600
+	5450 4100 5450 4300
 Wire Wire Line
-	3850 4000 3850 4600
+	5450 4300 5450 4600
 Wire Wire Line
-	3650 3900 3650 4600
+	3850 4000 3850 4300
+Wire Wire Line
+	3850 4300 3850 4600
+Wire Wire Line
+	3650 3900 3650 4500
+Wire Wire Line
+	3650 4500 3650 4600
 Connection ~ 1600 2200
 Connection ~ 1600 2300
 Connection ~ 5450 4300
@@ -453,4 +467,12 @@ Wire Wire Line
 	3650 3900 5600 3900
 Wire Wire Line
 	5900 3900 7100 3900
+Wire Notes Line
+	5550 3850 5550 4300
+Wire Notes Line
+	5550 4300 6700 4300
+Wire Notes Line
+	6700 4300 6700 3850
+Text Notes 5600 4250 0    39   ~ 0
+unsure about resistor value.\n1k is a guess.
 $EndSCHEMATC
