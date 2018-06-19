@@ -13,15 +13,15 @@
 
 static inline uint16_t decode_colormask(uint8_t mask)
 {
-	switch(mask & 0b11U) {
-		case 0b00:
+	switch(mask & 0x3U) {
+		case 0x0:
 			return 0U;
-		case 0b01:
+		case 0x1:
 			return 64U;
-		case 0b10:
+		case 0x2:
 			return 128U;
 		default:
-		case 0b11:
+		case 0x3:
 			return 255U;
 	}
 }
@@ -38,7 +38,7 @@ static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_atten
 	return val;
 }
 
-enum {
+__attribute__((unused)) enum {
 	MODE_ATTENUATION = 0,
 	MODE_COLOR = 1,
 	MODE_SPOTWIDTH = 2,
@@ -79,7 +79,7 @@ static void calca_init(void)
 		ws2812_init();
 
 		calca_mode = 0;
-		calca_color = 0b000001;
+		calca_color = 0x1;
 		calca_attenuation = MAX_ATTENUATION-1;
 		calca_pos = 0;
 		calca_oncount = LIGHT_COUNT;

@@ -8,11 +8,11 @@ PARTNO := t10
 MMCU := attiny10
 CLOCK := 8000000UL
 
-CC := avr-gcc
-CFLAGS += -Wall -Werror -Wstrict-prototypes
-CFLAGS += -g -Os -mmcu=${MMCU} -DF_CPU=${CLOCK} -I.
+CC := avr-g++
+CFLAGS += -Wall -Werror -Wshadow --pedantic
+CFLAGS += -g -gdwarf-4 -Os -mmcu=${MMCU} -DF_CPU=${CLOCK} -I.
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fstack-usage
-CFLAGS += -std=gnu99
+CFLAGS += -std=c++17
 CFLAGS += -Wa,-adhlns=$(<:%.c=%.lst)
 
 LDFLAGS=-mmcu=${MMCU} -Wl,--cref,-Map=$(@:%.elf=%.map)

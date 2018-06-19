@@ -13,7 +13,7 @@ static inline void setup_registers(void)
 	CCP = 0xD8;		// allow writes to CLKPSR
 	CLKPSR = 0;		// disable prescaler
 	CCP = 0xD8;		// allow writes to CLKPSR
-	CLKMSR = 0b00U;		// select internal 8MHz oscillator
+	CLKMSR = 0x0U;		// select internal 8MHz oscillator
 
 	// set sleep-mode to idle
 	SMCR = 0;
@@ -70,7 +70,7 @@ int main(void)
 				PRR &= ~(1 << PRTIM0);
 				TCCR0A = 0;
 				TCCR0C = 0;
-				TCCR0B = 0b00000101; // TimerCLK is IoCLK/1024
+				TCCR0B = 0x5; // TimerCLK is IoCLK/1024
 				TCNT0 = 0;
 			} else {
 				if(TCNT0 > 2604) {
