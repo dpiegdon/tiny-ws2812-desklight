@@ -48,14 +48,18 @@ static void calca_set_new_values(void)
 	int8_t count;
 	int8_t tail = LIGHT_COUNT - calca_pos - calca_oncount;
 
-	for(count = calca_pos; count > 0; --count)
-		ws2812_set_single(0,0,0);
+	cli();
+	{
+		for(count = calca_pos; count > 0; --count)
+			ws2812_set_single(0,0,0);
 
-	for(count = calca_oncount; count > 0; --count)
-		ws2812_set_single(r,g,b);
+		for(count = calca_oncount; count > 0; --count)
+			ws2812_set_single(r,g,b);
 
-	for(count = tail; count > 0; --count)
-		ws2812_set_single(0,0,0);
+		for(count = tail; count > 0; --count)
+			ws2812_set_single(0,0,0);
+	}
+	sei();
 }
 
 static void calca_init(void)
@@ -68,14 +72,10 @@ static void calca_init(void)
 	calca_pos = 0;
 	calca_oncount = LIGHT_COUNT;
 
-	cli();
-	{
-		calca_set_new_values();
-	}
-	sei();
+	calca_set_new_values();
 }
 
-static inline void calca_next(void)
+static inline void calca_button(void)
 {
 	calca_mode++;
 	calca_mode %= MODECOUNT;
@@ -110,11 +110,7 @@ static inline void calca_rotary_step(int8_t dir)
 			break;
 	};
 
-	cli();
-	{
-		calca_set_new_values();
-	}
-	sei();
+	calca_set_new_values();
 }
 
 #endif // __CALCA_H__

@@ -56,7 +56,7 @@ int main(void)
 		if(changed_io & switch_mask) {
 			if(current_io & switch_mask) {
 				// switch push-down event
-				calca_next();
+				calca_button();
 				// start timer0 for measurement of time
 				// until button-release
 				PRR &= ~(1 << PRTIM0);
