@@ -35,9 +35,9 @@ enum calca_modes {
 
 static uint8_t calca_mode;
 static uint16_t calca_color;
-static uint8_t calca_attenuation;
-static uint8_t calca_pos;
-static uint8_t calca_oncount;
+static int8_t calca_attenuation;
+static int8_t calca_pos;
+static int8_t calca_oncount;
 
 static void calca_set_new_values(void)
 {
@@ -45,8 +45,8 @@ static void calca_set_new_values(void)
 	uint8_t g = get_channel_brightness(calca_color >> 2, calca_attenuation);
 	uint8_t b = get_channel_brightness(calca_color >> 4, calca_attenuation);
 
-	uint8_t count;
-	uint8_t tail = LIGHT_COUNT - calca_pos - calca_oncount;
+	int8_t count;
+	int8_t tail = LIGHT_COUNT - calca_pos - calca_oncount;
 
 	for(count = calca_pos; count > 0; --count)
 		ws2812_set_single(0,0,0);
@@ -60,16 +60,16 @@ static void calca_set_new_values(void)
 
 static void calca_init(void)
 {
+	ws2812_init();
+
+	calca_mode = 0;
+	calca_color = 0x1;
+	calca_attenuation = MAX_ATTENUATION-1;
+	calca_pos = 0;
+	calca_oncount = LIGHT_COUNT;
+
 	cli();
 	{
-		ws2812_init();
-
-		calca_mode = 0;
-		calca_color = 0x1;
-		calca_attenuation = MAX_ATTENUATION-1;
-		calca_pos = 0;
-		calca_oncount = LIGHT_COUNT;
-
 		calca_set_new_values();
 	}
 	sei();
@@ -81,55 +81,34 @@ static inline void calca_next(void)
 	calca_mode %= MODECOUNT;
 }
 
-static inline void calca_rotary_up(void)
+static uint8_t check_bounds(uint8_t value, uint8_t lower, uint8_t higher)
 {
-	switch(calca_mode) {
-		case MODE_ATTENUATION:
-			if(calca_attenuation > 0)
-				calca_attenuation -= 1;
-			break;
-		case MODE_COLOR:
-			calca_color += 1;
-			break;
-		case MODE_SPOTWIDTH:
-			if(LIGHT_COUNT > calca_pos + calca_oncount)
-				calca_oncount += 1;
-			break;
-		default:
-		case MODE_SPOTPOS:
-			if(LIGHT_COUNT > calca_pos + calca_oncount)
-				calca_pos += 1;
-			break;
-	};
-
-	cli();
-	{
-		calca_set_new_values();
-	}
-	sei();
+	return (value < lower) ? lower :
+		(value > higher) ? higher :
+		value;
 }
 
-static inline void calca_rotary_down(void)
+static inline void calca_rotary_step(int8_t dir)
 {
 	switch(calca_mode) {
 		case MODE_ATTENUATION:
-			if(calca_attenuation < MAX_ATTENUATION)
-				calca_attenuation += 1;
+			calca_attenuation += dir;
+			if(calca_attenuation<0)
+				calca_attenuation=0;
+			else if(calca_attenuation > MAX_ATTENUATION)
+				calca_attenuation = MAX_ATTENUATION;
 			break;
 		case MODE_COLOR:
-			calca_color -= 1;
+			calca_color += dir;
 			break;
 		case MODE_SPOTWIDTH:
-			if(calca_oncount > 0)
-				calca_oncount -= 1;
+			calca_oncount = check_bounds(calca_oncount + dir, 0, LIGHT_COUNT);
 			break;
 		default:
 		case MODE_SPOTPOS:
-			if(calca_pos > 0)
-				calca_pos -= 1;
+			calca_pos = check_bounds(calca_pos + dir, 0, LIGHT_COUNT);
 			break;
 	};
-
 
 	cli();
 	{
