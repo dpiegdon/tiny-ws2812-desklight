@@ -1,21 +1,51 @@
-# NOTE: attiny4/5/9/10 need TPI-capable programmer. STK500 will not work.
-PROGRAMMER_ID := avrispmkII
-PORT := usb
 
-AVRDUDE_OPTS = -c ${PROGRAMMER_ID} -P ${PORT} -p ${PARTNO}
+CROSSCOMPILE ?= avr-
+
+CC := $(CROSSCOMPILE)gcc
+CPP := $(CROSSCOMPILE)gcc
+CXX := $(CROSSCOMPILE)g++
+AS := $(CROSSCOMPILE)as
+AR := $(CROSSCOMPILE)ar
+LD := $(CROSSCOMPILE)gcc
+GDB := $(CROSSCOMPILE)gdb
+NM := $(CROSSCOMPILE)nm
+OBJCOPY := $(CROSSCOMPILE)objcopy
+OBJDUMP := $(CROSSCOMPILE)objdump
+READELF := $(CROSSCOMPILE)readelf
+SIZE := $(CROSSCOMPILE)size
+
+###
 
 PARTNO := t10
 MMCU := attiny10
 CLOCK := 8000000UL
 
-CC := avr-g++
-CFLAGS += -Wall -Werror -Wshadow --pedantic
-CFLAGS += -g -gdwarf-4 -Os -mmcu=${MMCU} -DF_CPU=${CLOCK} -I.
-CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fstack-usage
-CFLAGS += -std=c++17
-CFLAGS += -Wa,-adhlns=$(<:%.c=%.lst)
+MCU_FLAGS += -mmcu=${MMCU} -DF_CPU=${CLOCK} -I.
+DEBUG_OPTIMIZE_FLAGS += -g -gdwarf-4 -Os
 
-LDFLAGS=-mmcu=${MMCU} -Wl,--cref,-Map=$(@:%.elf=%.map)
+# only one of these makes sense: either use LTO
+DEBUG_OPTIMIZE_FLAGS += -flto
+# or generate listings. listings wont make any sense when using LTO, as LTO does not
+# generate actual assembler code
+#CXXC_FLAGS += -Wa,-adhlns=$(<:%=%.lst)
+
+CXXC_FLAGS += -Wall -Werror -Wshadow --pedantic
+CXXC_FLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fstack-usage
+CXXC_FLAGS += $(MCU_FLAGS) $(DEBUG_OPTIMIZE_FLAGS)
+CXXFLAGS += $(CXXC_FLAGS) -std=c++17
+CFLAGS += $(CXXC_FLAGS) -std=c11
+
+LDFLAGS += $(MCU_FLAGS) $(DEBUG_OPTIMIZE_FLAGS)
+LDFLAGS += -Wl,--cref,-Map=$(@:%.elf=%.map)
+
+###
+
+# NOTE: attiny4/5/9/10 need TPI-capable programmer. STK500 will not work.
+PROGRAMMER_ID := avrispmkII
+PORT := usb
+AVRDUDE_OPTS := -c ${PROGRAMMER_ID} -P ${PORT} -p ${PARTNO}
+
+###
 
 .PHONY: all desklight readfuses fuses_desklight prog_flash_desklight prog_eeprom_desklight erase clean
 
@@ -41,27 +71,26 @@ erase:
 clean:
 	rm -f *.asm *.lst *.o *.map *.hex *.eep *.bin *.elf *.su
 
-desklight.elf: desklight.o
+###
 
-desklight.o: desklight.c calca.h ws2812.h
+desklight.o: desklight.cpp calca.h ws2812.h
 
-%.elf:
+###
+
+%.elf: %.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
 %.hex: %.elf
-	avr-objcopy -j .text -j .data -O ihex $< $@
-	avr-size $@
+	$(OBJCOPY) -j .text -j .data -O ihex $< $@
+	$(SIZE) $@
 
 %.eep: %.elf
-	avr-objcopy -j .eeprom -O ihex $< $@
-	avr-size $@
+	$(OBJCOPY) -j .eeprom -O ihex $< $@
+	$(SIZE) $@
 
 %.bin: %.elf
-	avr-objcopy -j .text -j .data -O binary $< $@
+	$(OBJCOPY) -j .text -j .data -O binary $< $@
 
 %.asm: %.elf
-	avr-objdump -d $< > $@
-
-%.o: %.S
-	$(CC) $(CFLAGS) -x assembler-with-cpp -c -o $@ $<
+	$(OBJDUMP)  -d $< > $@
 
