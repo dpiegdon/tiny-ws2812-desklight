@@ -66,7 +66,7 @@ static void calca_init(void)
 {
 	ws2812_init();
 
-	calca_mode = 0;
+	calca_mode = MODE_ATTENUATION;
 	calca_color = 0x1;
 	calca_attenuation = MAX_ATTENUATION-1;
 	calca_pos = 0;
