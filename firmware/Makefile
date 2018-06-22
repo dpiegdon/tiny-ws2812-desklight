@@ -24,10 +24,10 @@ MCU_FLAGS += -mmcu=${MMCU} -DF_CPU=${CLOCK} -I.
 DEBUG_OPTIMIZE_FLAGS += -g -gdwarf-4 -Os
 
 # only one of these makes sense: either use LTO
-DEBUG_OPTIMIZE_FLAGS += -flto
+#DEBUG_OPTIMIZE_FLAGS += -flto
 # or generate listings. listings wont make any sense when using LTO, as LTO does not
 # generate actual assembler code
-#CXXC_FLAGS += -Wa,-adhlns=$(<:%=%.lst)
+CXXC_FLAGS += -Wa,-adhlns=$(<:%=%.lst)
 
 CXXC_FLAGS += -Wall -Werror -Wshadow --pedantic
 CXXC_FLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -fstack-usage

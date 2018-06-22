@@ -34,7 +34,7 @@ enum calca_modes {
 };
 
 static uint8_t calca_mode;
-static uint16_t calca_color;
+static uint8_t calca_color;
 static int8_t calca_attenuation;
 static int8_t calca_pos;
 static int8_t calca_oncount;
@@ -102,7 +102,7 @@ static inline void calca_rotary_step(int8_t dir)
 			calca_color += dir;
 			break;
 		case MODE_SPOTWIDTH:
-			calca_oncount = check_bounds(calca_oncount + dir, 1, LIGHT_COUNT);
+			calca_oncount = check_bounds(calca_oncount + dir, 1, LIGHT_COUNT-calca_pos);
 			break;
 		default:
 		case MODE_SPOTPOS:
