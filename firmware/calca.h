@@ -67,7 +67,7 @@ static void calca_init(void)
 	ws2812_init();
 
 	calca_mode = MODE_ATTENUATION;
-	calca_color = 0x1;
+	calca_color = 0x3;
 	calca_attenuation = MAX_ATTENUATION-1;
 	calca_pos = 0;
 	calca_oncount = LIGHT_COUNT;
@@ -81,7 +81,7 @@ static inline void calca_button(void)
 	calca_mode %= MODECOUNT;
 }
 
-static uint8_t check_bounds(uint8_t value, uint8_t lower, uint8_t higher)
+static int8_t check_bounds(int8_t value, int8_t lower, int8_t higher)
 {
 	return (value < lower) ? lower :
 		(value > higher) ? higher :
@@ -102,11 +102,11 @@ static inline void calca_rotary_step(int8_t dir)
 			calca_color += dir;
 			break;
 		case MODE_SPOTWIDTH:
-			calca_oncount = check_bounds(calca_oncount + dir, 0, LIGHT_COUNT);
+			calca_oncount = check_bounds(calca_oncount + dir, 1, LIGHT_COUNT);
 			break;
 		default:
 		case MODE_SPOTPOS:
-			calca_pos = check_bounds(calca_pos + dir, 0, LIGHT_COUNT);
+			calca_pos = check_bounds(calca_pos + dir, 0, LIGHT_COUNT-calca_oncount);
 			break;
 	};
 

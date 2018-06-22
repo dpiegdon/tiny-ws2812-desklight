@@ -50,11 +50,10 @@ int main(void)
 		uint8_t current_io = PINB & event_mask;
 		uint8_t changed_io = (current_io ^ previous_io);
 
-		if((changed_io & rotary_mask) && (0 == (previous_io & rotary_mask)))
+		if((changed_io & rotary_mask) && (0 == (previous_io & rotary_mask))) {
 			calca_rotary_step( (current_io & (1 << PIN_ROTARY1)) ? 1 : -1);
-
-		if(changed_io & switch_mask) {
-			if(current_io & switch_mask) {
+		} else if(changed_io & switch_mask) {
+			if(!(current_io & switch_mask)) {
 				// switch push-down event
 				calca_button();
 				// start timer0 for measurement of time
