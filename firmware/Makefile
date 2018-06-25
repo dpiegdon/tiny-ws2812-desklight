@@ -92,5 +92,5 @@ desklight.o: desklight.cpp calca.h ws2812.h
 	$(OBJCOPY) -j .text -j .data -O binary $< $@
 
 %.asm: %.elf
-	$(OBJDUMP)  -d $< > $@
+	$(OBJDUMP) -dgCxwsSh --show-raw-insn $< > $@
 
