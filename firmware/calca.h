@@ -13,8 +13,10 @@
 
 static inline uint8_t decode_colormask(uint8_t mask)
 {
-	static const uint8_t brightness_map[4] = {0, 64, 128, 255};
-	return brightness_map[mask&3];
+	uint8_t ret = mask << 6;
+	if(ret == 192)
+		ret = 255;
+	return ret;
 }
 
 static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
