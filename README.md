@@ -48,30 +48,18 @@ defaults.
 Firmware
 --------
 
-You probably have to use AVR-GCC Version >= 7.3.0 for compilation. As the
-ATTiny10 is very space-constrained, older gcc versions don't optimize well
-enough to meet the space-constrains with the current feature set.
+You probably have to use a recent AVR-GCC Version for compilation. Version 5.4.0
+is good, 7.3.0 yields even better results. As the ATTiny10 is very
+space-constrained, older gcc versions may not optimize well enough to meet the
+space-constrains with the current feature set.
 
-If you don't have an AVR-GCC optimizing well enought, but want to change the
-number of lights for the supplied BIN file: a current build should be supplied
-in `firmware/build/`. Open `desklight.asm` and search for `ws2812_init` or
-`calca_init`. There should be some assignment to `light_count`. You need to
-change this immediate value in the BIN file. e.g.:
+If you want to change the number of lights in the firmware, please do so in
+`ws2812.h`. If you know what you are doing, you can also change the assignment
+to `light_count` in the firmware files (in `ws2812_init()`, `calca_init()`, if
+you don't want to recompile.)
 
-
-		0000024e <calca_init()>:
-			light_count = LIGHT_COUNT;
-		 24e:	42 e2       	ldi	r20, 0x22	; 34
-		 250:	40 a9       	sts	0x40, r20	; 0x800040 <_edata>
-			DDRB |= (1 << PIN_LED);
-		 252:	08 9a       	sbi	0x01, 0	; 1
-
-
-So you need to replace the bytes `42 e2` at offset 0x2e4 with a command
-assigning your required value to r20.
-
-Note that you can not use more than 63 lights. The actual constraint is: `2 *
-lightcount + 1 <= max_value(int8_t)/2`.
+Note that you can not use more than 63 lights. The actual constraint is
+something like `2 * lightcount + 1 <= max_value(int8_t)`.
 
 
 Hardware
