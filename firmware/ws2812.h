@@ -10,7 +10,7 @@
 #define PIN_LED PB0
 
 #define LIGHT_COUNT 34
-int8_t light_count;
+uint8_t light_count;
 
 static inline void ws2812_init(void)
 {

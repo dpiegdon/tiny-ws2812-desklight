@@ -38,8 +38,8 @@ enum calca_modes {
 static uint8_t calca_mode;
 static uint8_t calca_color;
 static int8_t calca_attenuation;
-static int8_t calca_pos;
-static int8_t calca_width;
+static uint8_t calca_pos;
+static uint8_t calca_width;
 
 static void calca_set_new_values(void)
 {
@@ -47,8 +47,8 @@ static void calca_set_new_values(void)
 	uint8_t g = get_channel_brightness(calca_color >> 2, calca_attenuation);
 	uint8_t b = get_channel_brightness(calca_color >> 4, calca_attenuation);
 
-	int8_t calca_offpos = calca_pos + calca_width;
-	int8_t head_on = (calca_offpos > light_count) ? (calca_offpos % light_count) : 0;
+	uint8_t calca_offpos = calca_pos + calca_width;
+	uint8_t head_on = (calca_offpos > light_count) ? (calca_offpos % light_count) : 0;
 	int8_t head_off = calca_pos - head_on;
 	int8_t tail_on = calca_width - head_on;
 	int8_t tail_off = light_count - head_on - head_off - tail_on;
@@ -112,7 +112,7 @@ static inline void calca_rotary_step(int8_t dir)
 			break;
 		default:
 		case MODE_SPOTPOS:
-			calca_pos = (calca_pos + dir + light_count) % light_count;
+			calca_pos = uint8_t(calca_pos + dir + light_count) % light_count;
 			break;
 	};
 
