@@ -93,7 +93,7 @@ desklight.o: desklight.cpp calca.h ws2812.h
 
 %.asm: %.elf
 	@# for private builds:
-	@#$(OBJDUMP) -dgCxwsSh --show-raw-insn $< > $@
+	$(OBJDUMP) -dgCxwsSh --show-raw-insn $< > $@
 	@# for public builds which should not leak data:
-	$(OBJDUMP) -dCwSh --show-raw-insn $< > $@
+	@#$(OBJDUMP) -dCwSh --show-raw-insn $< > $@
 
