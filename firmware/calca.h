@@ -6,7 +6,9 @@
 
 #include <avr/interrupt.h>
 
-#define ATTENUATION(x) ( (x) * 15 / 16 )
+// this is the same as (((x)*15)/16), but does not require software-multiplication:
+#define ATTENUATION(x) ( (((x)<<4) - (x)) / 16 )
+
 // given the above formula using integers, there are this many
 // attenuations that are distinct (plus one, which is NO attenuation '0')
 #define MAX_ATTENUATION 53
