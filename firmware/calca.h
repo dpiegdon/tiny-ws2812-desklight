@@ -39,7 +39,7 @@ static uint8_t calca_mode;
 static uint8_t calca_color;
 static int8_t calca_attenuation;
 static int8_t calca_pos;
-static int8_t calca_oncount;
+static int8_t calca_width;
 
 static void calca_set_new_values(void)
 {
@@ -48,18 +48,25 @@ static void calca_set_new_values(void)
 	uint8_t b = get_channel_brightness(calca_color >> 4, calca_attenuation);
 
 	int8_t count;
-	int8_t tail = LIGHT_COUNT - calca_pos - calca_oncount;
+	int8_t calca_offpos = calca_pos + calca_width;
+	int8_t head_on = (calca_offpos > LIGHT_COUNT) ? (calca_offpos % LIGHT_COUNT) : 0;
+	int8_t head_off = calca_pos - head_on;
+	int8_t tail_on = calca_width - head_on;
+	int8_t tail_off = LIGHT_COUNT - head_on - head_off - tail_on;
 
 	cli();
 	{
-		for(count = calca_pos; count > 0; --count)
-			ws2812_set_single(0,0,0);
+		for(count = head_on; count > 0; --count)
+			ws2812_set_single(r, g, b);
 
-		for(count = calca_oncount; count > 0; --count)
-			ws2812_set_single(r,g,b);
+		for(count = head_off; count > 0; --count)
+			ws2812_set_single(0, 0, 0);
 
-		for(count = tail; count > 0; --count)
-			ws2812_set_single(0,0,0);
+		for(count = tail_on; count > 0; --count)
+			ws2812_set_single(r, g, b);
+
+		for(count = tail_off; count > 0; --count)
+			ws2812_set_single(0, 0, 0);
 	}
 	sei();
 }
@@ -72,7 +79,7 @@ static void calca_init(void)
 	calca_color = 0x3;
 	calca_attenuation = MAX_ATTENUATION-1;
 	calca_pos = 0;
-	calca_oncount = LIGHT_COUNT;
+	calca_width = LIGHT_COUNT;
 
 	calca_set_new_values();
 }
@@ -94,21 +101,17 @@ static inline void calca_rotary_step(int8_t dir)
 {
 	switch(calca_mode) {
 		case MODE_ATTENUATION:
-			calca_attenuation += dir;
-			if(calca_attenuation<0)
-				calca_attenuation=0;
-			else if(calca_attenuation > MAX_ATTENUATION)
-				calca_attenuation = MAX_ATTENUATION;
+			calca_attenuation = check_bounds(calca_attenuation + dir, 0, MAX_ATTENUATION);
 			break;
 		case MODE_COLOR:
 			calca_color += dir;
 			break;
 		case MODE_SPOTWIDTH:
-			calca_oncount = check_bounds(calca_oncount + dir, 1, LIGHT_COUNT-calca_pos);
+			calca_width = check_bounds(calca_width + dir, 1, LIGHT_COUNT);
 			break;
 		default:
 		case MODE_SPOTPOS:
-			calca_pos = check_bounds(calca_pos + dir, 0, LIGHT_COUNT-calca_oncount);
+			calca_pos = (calca_pos + dir + LIGHT_COUNT) % LIGHT_COUNT;
 			break;
 	};
 
