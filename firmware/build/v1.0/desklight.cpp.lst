@@ -1,0 +1,1118 @@
+   1               		.file	"desklight.cpp"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__CCP__ = 0x3c
+   6               	__tmp_reg__ = 16
+   7               	__zero_reg__ = 17
+   8               		.text
+   9               	.Ltext0:
+  10               		.cfi_sections	.debug_frame
+  12               	_ZL23ws2812_send_single_byteh:
+  13               	.LFB7:
+  14               		.file 1 "ws2812.h"
+   1:ws2812.h      **** 
+   2:ws2812.h      **** #ifndef __WS2812_H__
+   3:ws2812.h      **** # define __WS2812_H__
+   4:ws2812.h      **** 
+   5:ws2812.h      **** #include <stdint.h>
+   6:ws2812.h      **** #include <avr/cpufunc.h>
+   7:ws2812.h      **** #include <avr/io.h>
+   8:ws2812.h      **** #include <util/delay.h>
+   9:ws2812.h      **** 
+  10:ws2812.h      **** #define PIN_LED PB0
+  11:ws2812.h      **** 
+  12:ws2812.h      **** #define LIGHT_COUNT 34
+  13:ws2812.h      **** int8_t light_count;
+  14:ws2812.h      **** 
+  15:ws2812.h      **** static inline void ws2812_init(void)
+  16:ws2812.h      **** {
+  17:ws2812.h      **** 	light_count = LIGHT_COUNT;
+  18:ws2812.h      **** 	DDRB |= (1 << PIN_LED);
+  19:ws2812.h      **** }
+  20:ws2812.h      **** 
+  21:ws2812.h      **** static inline void ws2812_send_single_byte(uint8_t byte)
+  22:ws2812.h      **** {
+  15               		.loc 1 22 0
+  16               		.cfi_startproc
+  17               	.LVL0:
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  22               		.loc 1 22 0
+  23 0000 48E0      		ldi r20,lo8(8)
+  24 0002 50E0      		ldi r21,0
+  25               	.LBB8:
+  23:ws2812.h      **** 	for(uint8_t mask = 0x80; mask != 0; mask >>= 1) {
+  26               		.loc 1 23 0
+  27 0004 60E8      		ldi r22,lo8(-128)
+  28               	.LVL1:
+  29               	.L4:
+  24:ws2812.h      **** 		if(byte & mask) {
+  30               		.loc 1 24 0
+  31 0006 782F      		mov r23,r24
+  32 0008 7623      		and r23,r22
+  33 000a 01F0      		breq .L2
+  25:ws2812.h      **** 			__asm__ __volatile__("sbi %0, %1 \n\t"
+  26:ws2812.h      **** 					     "nop \n\t"
+  27:ws2812.h      **** 					     "nop \n\t"
+  28:ws2812.h      **** 					     "nop \n\t"
+  29:ws2812.h      **** 					     "cbi %0, %1 \n\t"
+  30:ws2812.h      **** 					     :
+  31:ws2812.h      **** 					     : "i" (0x2), "i" (PIN_LED)
+  32:ws2812.h      **** 					     :
+  33:ws2812.h      **** 					);
+  34               		.loc 1 33 0
+  35               	/* #APP */
+  36               	 ;  33 "ws2812.h" 1
+  37 000c 109A      		sbi 2, 0 
+  38 000e 0000      		nop 
+  39 0010 0000      		nop 
+  40 0012 0000      		nop 
+  41 0014 1098      		cbi 2, 0 
+  42               		
+  43               	 ;  0 "" 2
+  44               	/* #NOAPP */
+  45               	.L3:
+  23:ws2812.h      **** 		if(byte & mask) {
+  46               		.loc 1 23 0 discriminator 2
+  47 0016 6695      		lsr r22
+  48               	.LVL2:
+  49 0018 4150      		subi r20,1
+  50 001a 510B      		sbc r21,__zero_reg__
+  51 001c 01F4      		brne .L4
+  52               	/* epilogue start */
+  53               	.LBE8:
+  34:ws2812.h      **** 		} else {
+  35:ws2812.h      **** 			__asm__ __volatile__("sbi %0, %1 \n\t"
+  36:ws2812.h      **** 					     "nop \n\t"
+  37:ws2812.h      **** 					     "cbi %0, %1 \n\t"
+  38:ws2812.h      **** 					     :
+  39:ws2812.h      **** 					     : "i" (0x2), "i" (PIN_LED)
+  40:ws2812.h      **** 					     :
+  41:ws2812.h      **** 					);
+  42:ws2812.h      **** 		}
+  43:ws2812.h      **** 	}
+  44:ws2812.h      **** }
+  54               		.loc 1 44 0
+  55 001e 0895      		ret
+  56               	.LVL3:
+  57               	.L2:
+  58               	.LBB9:
+  41:ws2812.h      **** 		}
+  59               		.loc 1 41 0
+  60               	/* #APP */
+  61               	 ;  41 "ws2812.h" 1
+  62 0020 109A      		sbi 2, 0 
+  63 0022 0000      		nop 
+  64 0024 1098      		cbi 2, 0 
+  65               		
+  66               	 ;  0 "" 2
+  67               	/* #NOAPP */
+  68 0026 00C0      		rjmp .L3
+  69               	.LBE9:
+  70               		.cfi_endproc
+  71               	.LFE7:
+  74               	_ZL22get_channel_brightnesshh:
+  75               	.LFB10:
+  76               		.file 2 "calca.h"
+   1:calca.h       **** 
+   2:calca.h       **** #ifndef __CALCA_H__
+   3:calca.h       **** # define __CALCA_H__
+   4:calca.h       **** 
+   5:calca.h       **** #include "ws2812.h"
+   6:calca.h       **** 
+   7:calca.h       **** #include <avr/interrupt.h>
+   8:calca.h       **** 
+   9:calca.h       **** #define ATTENUATION(x) ( (x) * 15 / 16 )
+  10:calca.h       **** // given the above formula using integers, there are this many
+  11:calca.h       **** // attenuations that are distinct (plus one, which is NO attenuation '0')
+  12:calca.h       **** #define MAX_ATTENUATION 53
+  13:calca.h       **** 
+  14:calca.h       **** static inline uint8_t decode_colormask(uint8_t mask)
+  15:calca.h       **** {
+  16:calca.h       **** 	uint8_t ret = mask << 6;
+  17:calca.h       **** 	if(ret == 192)
+  18:calca.h       **** 		ret = 255;
+  19:calca.h       **** 	return ret;
+  20:calca.h       **** }
+  21:calca.h       **** 
+  22:calca.h       **** static uint8_t get_channel_brightness(uint8_t channelmask, uint8_t current_attenuation)
+  23:calca.h       **** {
+  77               		.loc 2 23 0
+  78               		.cfi_startproc
+  79               	.LVL4:
+  80               	/* prologue: function */
+  81               	/* frame size = 0 */
+  82               	/* stack size = 0 */
+  83               	.L__stack_usage = 0
+  84 0028 462F      		mov r20,r22
+  85               	.LVL5:
+  86               	.LBB10:
+  87               	.LBB11:
+  16:calca.h       **** 	if(ret == 192)
+  88               		.loc 2 16 0
+  89 002a 8295      		swap r24
+  90               	.LVL6:
+  91 002c 880F      		lsl r24
+  92 002e 880F      		lsl r24
+  93 0030 807C      		andi r24,lo8(-64)
+  94               	.LVL7:
+  17:calca.h       **** 		ret = 255;
+  95               		.loc 2 17 0
+  96 0032 803C      		cpi r24,lo8(-64)
+  97 0034 01F4      		brne .L7
+  18:calca.h       **** 	return ret;
+  98               		.loc 2 18 0
+  99 0036 8FEF      		ldi r24,lo8(-1)
+ 100               	.LVL8:
+ 101               	.L7:
+ 102               	.LBE11:
+ 103               	.LBE10:
+  24:calca.h       **** 	uint16_t val = decode_colormask(channelmask);
+ 104               		.loc 2 24 0
+ 105 0038 90E0      		ldi r25,0
+ 106               	.LVL9:
+ 107               	.L9:
+  25:calca.h       **** 	while(current_attenuation--)
+ 108               		.loc 2 25 0
+ 109               	.LVL10:
+ 110 003a 4150      		subi r20,1
+ 111 003c 00F0      		brcs .L8
+  26:calca.h       **** 		val = ATTENUATION(val);
+ 112               		.loc 2 26 0
+ 113 003e 6FE0      		ldi r22,lo8(15)
+ 114 0040 70E0      		ldi r23,0
+ 115 0042 00D0      		rcall __mulhi3
+ 116               	.LVL11:
+ 117 0044 54E0      		ldi r21,4
+ 118               		1:
+ 119 0046 9695      		lsr r25
+ 120 0048 8795      		ror r24
+ 121 004a 5A95      		dec r21
+ 122 004c 01F4      		brne 1b
+ 123               	.LVL12:
+  25:calca.h       **** 	while(current_attenuation--)
+ 124               		.loc 2 25 0
+ 125 004e 00C0      		rjmp .L9
+ 126               	.L8:
+ 127               	.LVL13:
+ 128               	/* epilogue start */
+  27:calca.h       **** 	return val;
+  28:calca.h       **** }
+ 129               		.loc 2 28 0
+ 130 0050 0895      		ret
+ 131               		.cfi_endproc
+ 132               	.LFE10:
+ 135               	_ZL20calca_set_new_valuesv:
+ 136               	.LFB11:
+  29:calca.h       **** 
+  30:calca.h       **** enum calca_modes {
+  31:calca.h       **** 	MODE_ATTENUATION = 0,
+  32:calca.h       **** 	MODE_COLOR = 1,
+  33:calca.h       **** 	MODE_SPOTWIDTH = 2,
+  34:calca.h       **** 	MODE_SPOTPOS = 3,
+  35:calca.h       **** 	MODECOUNT = 4,
+  36:calca.h       **** };
+  37:calca.h       **** 
+  38:calca.h       **** static uint8_t calca_mode;
+  39:calca.h       **** static uint8_t calca_color;
+  40:calca.h       **** static int8_t calca_attenuation;
+  41:calca.h       **** static int8_t calca_pos;
+  42:calca.h       **** static int8_t calca_width;
+  43:calca.h       **** 
+  44:calca.h       **** static void calca_set_new_values(void)
+  45:calca.h       **** {
+ 137               		.loc 2 45 0
+ 138               		.cfi_startproc
+ 139 0052 2F93      		push r18
+ 140               		.cfi_def_cfa_offset 3
+ 141               		.cfi_offset 18, -2
+ 142 0054 3F93      		push r19
+ 143               		.cfi_def_cfa_offset 4
+ 144               		.cfi_offset 19, -3
+ 145 0056 CF93      		push r28
+ 146               		.cfi_def_cfa_offset 5
+ 147               		.cfi_offset 28, -4
+ 148 0058 DF93      		push r29
+ 149               		.cfi_def_cfa_offset 6
+ 150               		.cfi_offset 29, -5
+ 151 005a 00D0      		rcall .
+ 152 005c 00D0      		rcall .
+ 153 005e 00D0      		rcall .
+ 154               		.cfi_def_cfa_offset 12
+ 155 0060 CDB7      		in r28,__SP_L__
+ 156 0062 DEB7      		in r29,__SP_H__
+ 157               		.cfi_def_cfa_register 28
+ 158               	/* prologue: function */
+ 159               	/* frame size = 6 */
+ 160               	/* stack size = 10 */
+ 161               	.L__stack_usage = 10
+  46:calca.h       **** 	uint8_t r = get_channel_brightness(calca_color >> 0, calca_attenuation);
+ 162               		.loc 2 46 0
+ 163 0064 30A0      		lds r19,_ZL17calca_attenuation
+ 164 0066 40A0      		lds r20,_ZL11calca_color
+ 165 0068 CE5F      		subi r28,lo8(-(2))
+ 166 006a DF4F      		sbci r29,hi8(-(2))
+ 167 006c 4883      		st Y,r20
+ 168 006e C250      		subi r28,lo8((2))
+ 169 0070 D040      		sbci r29,hi8((2))
+ 170 0072 632F      		mov r22,r19
+ 171 0074 842F      		mov r24,r20
+ 172 0076 00D0      		rcall _ZL22get_channel_brightnesshh
+ 173               	.LVL14:
+ 174 0078 CF5F      		subi r28,lo8(-(1))
+ 175 007a DF4F      		sbci r29,hi8(-(1))
+ 176 007c 8883      		st Y,r24
+ 177 007e C150      		subi r28,lo8((1))
+ 178 0080 D040      		sbci r29,hi8((1))
+ 179               	.LVL15:
+  47:calca.h       **** 	uint8_t g = get_channel_brightness(calca_color >> 2, calca_attenuation);
+ 180               		.loc 2 47 0
+ 181 0082 CE5F      		subi r28,lo8(-(2))
+ 182 0084 DF4F      		sbci r29,hi8(-(2))
+ 183 0086 5881      		ld r21,Y
+ 184 0088 C250      		subi r28,lo8((2))
+ 185 008a D040      		sbci r29,hi8((2))
+ 186 008c 452F      		mov r20,r21
+ 187 008e 50E0      		ldi r21,0
+ 188 0090 CB5F      		subi r28,lo8(-(4+1))
+ 189 0092 DF4F      		sbci r29,hi8(-(4+1))
+ 190 0094 5883      		st Y,r21
+ 191 0096 4A93      		st -Y,r20
+ 192 0098 C450      		subi r28,lo8((4))
+ 193 009a D040      		sbci r29,hi8((4))
+ 194 009c 952F      		mov r25,r21
+ 195 009e 842F      		mov r24,r20
+ 196               	.LVL16:
+ 197 00a0 9595      		asr r25
+ 198 00a2 8795      		ror r24
+ 199 00a4 9595      		asr r25
+ 200 00a6 8795      		ror r24
+ 201 00a8 632F      		mov r22,r19
+ 202 00aa 00D0      		rcall _ZL22get_channel_brightnesshh
+ 203               	.LVL17:
+ 204 00ac CE5F      		subi r28,lo8(-(2))
+ 205 00ae DF4F      		sbci r29,hi8(-(2))
+ 206 00b0 8883      		st Y,r24
+ 207 00b2 C250      		subi r28,lo8((2))
+ 208 00b4 D040      		sbci r29,hi8((2))
+ 209               	.LVL18:
+  48:calca.h       **** 	uint8_t b = get_channel_brightness(calca_color >> 4, calca_attenuation);
+ 210               		.loc 2 48 0
+ 211 00b6 CC5F      		subi r28,lo8(-(4))
+ 212 00b8 DF4F      		sbci r29,hi8(-(4))
+ 213 00ba 8991      		ld r24,Y+
+ 214 00bc 9881      		ld r25,Y
+ 215 00be C550      		subi r28,lo8((4+1))
+ 216 00c0 D040      		sbci r29,hi8((4+1))
+ 217               	.LVL19:
+ 218 00c2 54E0      		ldi r21,4
+ 219               		1:
+ 220 00c4 9595      		asr r25
+ 221 00c6 8795      		ror r24
+ 222 00c8 5A95      		dec r21
+ 223 00ca 01F4      		brne 1b
+ 224 00cc 632F      		mov r22,r19
+ 225 00ce 00D0      		rcall _ZL22get_channel_brightnesshh
+ 226               	.LVL20:
+ 227 00d0 CD5F      		subi r28,lo8(-(3))
+ 228 00d2 DF4F      		sbci r29,hi8(-(3))
+ 229 00d4 8883      		st Y,r24
+ 230 00d6 C350      		subi r28,lo8((3))
+ 231 00d8 D040      		sbci r29,hi8((3))
+ 232               	.LVL21:
+  49:calca.h       **** 
+  50:calca.h       **** 	int8_t calca_offpos = calca_pos + calca_width;
+ 233               		.loc 2 50 0
+ 234 00da 40A0      		lds r20,_ZL9calca_pos
+ 235 00dc 30A0      		lds r19,_ZL11calca_width
+ 236 00de 842F      		mov r24,r20
+ 237               	.LVL22:
+ 238 00e0 830F      		add r24,r19
+ 239               	.LVL23:
+  51:calca.h       **** 	int8_t head_on = (calca_offpos > light_count) ? (calca_offpos % light_count) : 0;
+ 240               		.loc 2 51 0
+ 241 00e2 50A0      		lds r21,light_count
+ 242 00e4 CC5F      		subi r28,lo8(-(4))
+ 243 00e6 DF4F      		sbci r29,hi8(-(4))
+ 244 00e8 5883      		st Y,r21
+ 245 00ea C450      		subi r28,lo8((4))
+ 246 00ec D040      		sbci r29,hi8((4))
+ 247 00ee 5817      		cp r21,r24
+ 248 00f0 04F0      		brlt .+2
+ 249 00f2 00C0      		rjmp .L17
+ 250               		.loc 2 51 0 is_stmt 0 discriminator 1
+ 251 00f4 082F      		mov __tmp_reg__,r24
+ 252 00f6 000F      		lsl r16
+ 253 00f8 990B      		sbc r25,r25
+ 254 00fa 652F      		mov r22,r21
+ 255 00fc 550F      		lsl r21
+ 256 00fe 770B      		sbc r23,r23
+ 257 0100 00D0      		rcall __divmodhi4
+ 258               	.LVL24:
+ 259 0102 CA5F      		subi r28,lo8(-(6))
+ 260 0104 DF4F      		sbci r29,hi8(-(6))
+ 261 0106 8883      		st Y,r24
+ 262 0108 C650      		subi r28,lo8((6))
+ 263 010a D040      		sbci r29,hi8((6))
+ 264               	.L11:
+ 265               	.LVL25:
+  52:calca.h       **** 	int8_t head_off = calca_pos - head_on;
+  53:calca.h       **** 	int8_t tail_on = calca_width - head_on;
+ 266               		.loc 2 53 0 is_stmt 1 discriminator 4
+ 267 010c CA5F      		subi r28,lo8(-(6))
+ 268 010e DF4F      		sbci r29,hi8(-(6))
+ 269 0110 5881      		ld r21,Y
+ 270 0112 C650      		subi r28,lo8((6))
+ 271 0114 D040      		sbci r29,hi8((6))
+ 272 0116 351B      		sub r19,r21
+ 273               	.LVL26:
+  54:calca.h       **** 	int8_t tail_off = light_count - head_on - head_off - tail_on;
+ 274               		.loc 2 54 0 discriminator 4
+ 275 0118 242F      		mov r18,r20
+ 276 011a 251B      		sub r18,r21
+ 277               	.LVL27:
+ 278 011c CC5F      		subi r28,lo8(-(4))
+ 279 011e DF4F      		sbci r29,hi8(-(4))
+ 280 0120 5881      		ld r21,Y
+ 281 0122 C450      		subi r28,lo8((4))
+ 282 0124 D040      		sbci r29,hi8((4))
+ 283 0126 541B      		sub r21,r20
+ 284 0128 531B      		sub r21,r19
+ 285 012a CC5F      		subi r28,lo8(-(4))
+ 286 012c DF4F      		sbci r29,hi8(-(4))
+ 287 012e 5883      		st Y,r21
+ 288 0130 C450      		subi r28,lo8((4))
+ 289 0132 D040      		sbci r29,hi8((4))
+ 290               	.LVL28:
+  55:calca.h       **** 
+  56:calca.h       **** 	cli();
+ 291               		.loc 2 56 0 discriminator 4
+ 292               	/* #APP */
+ 293               	 ;  56 "calca.h" 1
+ 294 0134 F894      		cli
+ 295               	 ;  0 "" 2
+ 296               	.LVL29:
+ 297               	/* #NOAPP */
+ 298               	.L13:
+ 299               	.LBB21:
+  57:calca.h       **** 	{
+  58:calca.h       **** 		int8_t i;
+  59:calca.h       **** 
+  60:calca.h       **** 		for(i = head_on; i > 0; --i)
+ 300               		.loc 2 60 0 discriminator 3
+ 301 0136 CA5F      		subi r28,lo8(-(6))
+ 302 0138 DF4F      		sbci r29,hi8(-(6))
+ 303 013a 4881      		ld r20,Y
+ 304 013c C650      		subi r28,lo8((6))
+ 305 013e D040      		sbci r29,hi8((6))
+ 306 0140 1417      		cp __zero_reg__,r20
+ 307 0142 04F4      		brge .L12
+ 308               	.LVL30:
+ 309               	.LBB22:
+ 310               	.LBB23:
+  45:ws2812.h      **** 
+  46:ws2812.h      **** static inline void ws2812_set_single(uint8_t r, uint8_t g, uint8_t b)
+  47:ws2812.h      **** {
+  48:ws2812.h      **** 	ws2812_send_single_byte(g);
+ 311               		.loc 1 48 0
+ 312 0144 CE5F      		subi r28,lo8(-(2))
+ 313 0146 DF4F      		sbci r29,hi8(-(2))
+ 314 0148 8881      		ld r24,Y
+ 315 014a C250      		subi r28,lo8((2))
+ 316 014c D040      		sbci r29,hi8((2))
+ 317 014e 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 318               	.LVL31:
+  49:ws2812.h      **** 	ws2812_send_single_byte(r);
+ 319               		.loc 1 49 0
+ 320 0150 CF5F      		subi r28,lo8(-(1))
+ 321 0152 DF4F      		sbci r29,hi8(-(1))
+ 322 0154 8881      		ld r24,Y
+ 323 0156 C150      		subi r28,lo8((1))
+ 324 0158 D040      		sbci r29,hi8((1))
+ 325 015a 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 326               	.LVL32:
+  50:ws2812.h      **** 	ws2812_send_single_byte(b);
+ 327               		.loc 1 50 0
+ 328 015c CD5F      		subi r28,lo8(-(3))
+ 329 015e DF4F      		sbci r29,hi8(-(3))
+ 330 0160 8881      		ld r24,Y
+ 331 0162 C350      		subi r28,lo8((3))
+ 332 0164 D040      		sbci r29,hi8((3))
+ 333 0166 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 334               	.LVL33:
+ 335 0168 CA5F      		subi r28,lo8(-(6))
+ 336 016a DF4F      		sbci r29,hi8(-(6))
+ 337 016c 5881      		ld r21,Y
+ 338 016e C650      		subi r28,lo8((6))
+ 339 0170 D040      		sbci r29,hi8((6))
+ 340 0172 5150      		subi r21,lo8(-(-1))
+ 341 0174 CA5F      		subi r28,lo8(-(6))
+ 342 0176 DF4F      		sbci r29,hi8(-(6))
+ 343 0178 5883      		st Y,r21
+ 344 017a C650      		subi r28,lo8((6))
+ 345 017c D040      		sbci r29,hi8((6))
+ 346               	.LVL34:
+ 347               	.LBE23:
+ 348               	.LBE22:
+ 349               		.loc 2 60 0
+ 350 017e 00C0      		rjmp .L13
+ 351               	.LVL35:
+ 352               	.L17:
+ 353               	.LBE21:
+  51:calca.h       **** 	int8_t head_off = calca_pos - head_on;
+ 354               		.loc 2 51 0
+ 355 0180 CA5F      		subi r28,lo8(-(6))
+ 356 0182 DF4F      		sbci r29,hi8(-(6))
+ 357 0184 1883      		st Y,__zero_reg__
+ 358 0186 C650      		subi r28,lo8((6))
+ 359 0188 D040      		sbci r29,hi8((6))
+ 360 018a 00C0      		rjmp .L11
+ 361               	.LVL36:
+ 362               	.L12:
+ 363               	.LBB30:
+  61:calca.h       **** 			ws2812_set_single(r, g, b);
+  62:calca.h       **** 
+  63:calca.h       **** 		for(i = head_off; i > 0; --i)
+ 364               		.loc 2 63 0 discriminator 3
+ 365 018c 1217      		cp __zero_reg__,r18
+ 366 018e 04F4      		brge .L14
+ 367               	.LVL37:
+ 368               	.LBB24:
+ 369               	.LBB25:
+  48:ws2812.h      **** 	ws2812_send_single_byte(r);
+ 370               		.loc 1 48 0
+ 371 0190 80E0      		ldi r24,0
+ 372 0192 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 373               	.LVL38:
+  49:ws2812.h      **** 	ws2812_send_single_byte(b);
+ 374               		.loc 1 49 0
+ 375 0194 80E0      		ldi r24,0
+ 376 0196 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 377               	.LVL39:
+ 378               		.loc 1 50 0
+ 379 0198 80E0      		ldi r24,0
+ 380 019a 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 381               	.LVL40:
+ 382 019c 2150      		subi r18,lo8(-(-1))
+ 383               	.LVL41:
+ 384               	.LBE25:
+ 385               	.LBE24:
+ 386               		.loc 2 63 0
+ 387 019e 00C0      		rjmp .L12
+ 388               	.LVL42:
+ 389               	.L14:
+  64:calca.h       **** 			ws2812_set_single(0, 0, 0);
+  65:calca.h       **** 
+  66:calca.h       **** 		for(i = tail_on; i > 0; --i)
+ 390               		.loc 2 66 0 discriminator 3
+ 391 01a0 1317      		cp __zero_reg__,r19
+ 392 01a2 04F4      		brge .L15
+ 393               	.LVL43:
+ 394               	.LBB26:
+ 395               	.LBB27:
+  48:ws2812.h      **** 	ws2812_send_single_byte(r);
+ 396               		.loc 1 48 0
+ 397 01a4 CE5F      		subi r28,lo8(-(2))
+ 398 01a6 DF4F      		sbci r29,hi8(-(2))
+ 399 01a8 8881      		ld r24,Y
+ 400 01aa C250      		subi r28,lo8((2))
+ 401 01ac D040      		sbci r29,hi8((2))
+ 402 01ae 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 403               	.LVL44:
+  49:ws2812.h      **** 	ws2812_send_single_byte(b);
+ 404               		.loc 1 49 0
+ 405 01b0 CF5F      		subi r28,lo8(-(1))
+ 406 01b2 DF4F      		sbci r29,hi8(-(1))
+ 407 01b4 8881      		ld r24,Y
+ 408 01b6 C150      		subi r28,lo8((1))
+ 409 01b8 D040      		sbci r29,hi8((1))
+ 410 01ba 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 411               	.LVL45:
+ 412               		.loc 1 50 0
+ 413 01bc CD5F      		subi r28,lo8(-(3))
+ 414 01be DF4F      		sbci r29,hi8(-(3))
+ 415 01c0 8881      		ld r24,Y
+ 416 01c2 C350      		subi r28,lo8((3))
+ 417 01c4 D040      		sbci r29,hi8((3))
+ 418 01c6 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 419               	.LVL46:
+ 420 01c8 3150      		subi r19,lo8(-(-1))
+ 421               	.LVL47:
+ 422               	.LBE27:
+ 423               	.LBE26:
+ 424               		.loc 2 66 0
+ 425 01ca 00C0      		rjmp .L14
+ 426               	.LVL48:
+ 427               	.L15:
+  67:calca.h       **** 			ws2812_set_single(r, g, b);
+  68:calca.h       **** 
+  69:calca.h       **** 		for(i = tail_off; i > 0; --i)
+ 428               		.loc 2 69 0 discriminator 3
+ 429 01cc CC5F      		subi r28,lo8(-(4))
+ 430 01ce DF4F      		sbci r29,hi8(-(4))
+ 431 01d0 4881      		ld r20,Y
+ 432 01d2 C450      		subi r28,lo8((4))
+ 433 01d4 D040      		sbci r29,hi8((4))
+ 434 01d6 1417      		cp __zero_reg__,r20
+ 435 01d8 04F4      		brge .L16
+ 436               	.LVL49:
+ 437               	.LBB28:
+ 438               	.LBB29:
+  48:ws2812.h      **** 	ws2812_send_single_byte(r);
+ 439               		.loc 1 48 0
+ 440 01da 80E0      		ldi r24,0
+ 441 01dc 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 442               	.LVL50:
+  49:ws2812.h      **** 	ws2812_send_single_byte(b);
+ 443               		.loc 1 49 0
+ 444 01de 80E0      		ldi r24,0
+ 445 01e0 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 446               	.LVL51:
+ 447               		.loc 1 50 0
+ 448 01e2 80E0      		ldi r24,0
+ 449 01e4 00D0      		rcall _ZL23ws2812_send_single_byteh
+ 450               	.LVL52:
+ 451 01e6 CC5F      		subi r28,lo8(-(4))
+ 452 01e8 DF4F      		sbci r29,hi8(-(4))
+ 453 01ea 5881      		ld r21,Y
+ 454 01ec C450      		subi r28,lo8((4))
+ 455 01ee D040      		sbci r29,hi8((4))
+ 456 01f0 5150      		subi r21,lo8(-(-1))
+ 457 01f2 CC5F      		subi r28,lo8(-(4))
+ 458 01f4 DF4F      		sbci r29,hi8(-(4))
+ 459 01f6 5883      		st Y,r21
+ 460 01f8 C450      		subi r28,lo8((4))
+ 461 01fa D040      		sbci r29,hi8((4))
+ 462               	.LVL53:
+ 463               	.LBE29:
+ 464               	.LBE28:
+ 465               		.loc 2 69 0
+ 466 01fc 00C0      		rjmp .L15
+ 467               	.LVL54:
+ 468               	.L16:
+ 469               	.LBE30:
+  70:calca.h       **** 			ws2812_set_single(0, 0, 0);
+  71:calca.h       **** 	}
+  72:calca.h       **** 	sei();
+ 470               		.loc 2 72 0
+ 471               	/* #APP */
+ 472               	 ;  72 "calca.h" 1
+ 473 01fe 7894      		sei
+ 474               	 ;  0 "" 2
+ 475               	/* epilogue start */
+  73:calca.h       **** }
+ 476               		.loc 2 73 0
+ 477               	/* #NOAPP */
+ 478 0200 0F91      		pop __tmp_reg__
+ 479 0202 0F91      		pop __tmp_reg__
+ 480 0204 0F91      		pop __tmp_reg__
+ 481 0206 0F91      		pop __tmp_reg__
+ 482 0208 0F91      		pop __tmp_reg__
+ 483 020a 0F91      		pop __tmp_reg__
+ 484 020c DF91      		pop r29
+ 485 020e CF91      		pop r28
+ 486               	.LVL55:
+ 487 0210 3F91      		pop r19
+ 488               	.LVL56:
+ 489 0212 2F91      		pop r18
+ 490               	.LVL57:
+ 491 0214 0895      		ret
+ 492               		.cfi_endproc
+ 493               	.LFE11:
+ 496               	_ZL10calca_initv:
+ 497               	.LFB12:
+  74:calca.h       **** 
+  75:calca.h       **** static void calca_init(void)
+  76:calca.h       **** {
+ 498               		.loc 2 76 0
+ 499               		.cfi_startproc
+ 500               	/* prologue: function */
+ 501               	/* frame size = 0 */
+ 502               	/* stack size = 0 */
+ 503               	.L__stack_usage = 0
+ 504               	.LBB33:
+ 505               	.LBB34:
+  17:ws2812.h      **** 	DDRB |= (1 << PIN_LED);
+ 506               		.loc 1 17 0
+ 507 0216 42E2      		ldi r20,lo8(34)
+ 508 0218 40A8      		sts light_count,r20
+  18:ws2812.h      **** }
+ 509               		.loc 1 18 0
+ 510 021a 089A      		sbi 0x1,0
+ 511               	.LBE34:
+ 512               	.LBE33:
+  77:calca.h       **** 	ws2812_init();
+  78:calca.h       **** 
+  79:calca.h       **** 	calca_mode = MODE_ATTENUATION;
+ 513               		.loc 2 79 0
+ 514 021c 10A8      		sts _ZL10calca_mode,__zero_reg__
+  80:calca.h       **** 	calca_color = 0x3;
+ 515               		.loc 2 80 0
+ 516 021e 43E0      		ldi r20,lo8(3)
+ 517 0220 40A8      		sts _ZL11calca_color,r20
+  81:calca.h       **** 	calca_attenuation = MAX_ATTENUATION-1;
+ 518               		.loc 2 81 0
+ 519 0222 44E3      		ldi r20,lo8(52)
+ 520 0224 40A8      		sts _ZL17calca_attenuation,r20
+  82:calca.h       **** 	calca_pos = 0;
+ 521               		.loc 2 82 0
+ 522 0226 10A8      		sts _ZL9calca_pos,__zero_reg__
+  83:calca.h       **** 	calca_width = light_count;
+ 523               		.loc 2 83 0
+ 524 0228 40A0      		lds r20,light_count
+ 525 022a 40A8      		sts _ZL11calca_width,r20
+  84:calca.h       **** 
+  85:calca.h       **** 	calca_set_new_values();
+ 526               		.loc 2 85 0
+ 527 022c 00C0      		rjmp _ZL20calca_set_new_valuesv
+ 528               	.LVL58:
+ 529               		.cfi_endproc
+ 530               	.LFE12:
+ 532               		.section	.text.startup,"ax",@progbits
+ 533               	.global	main
+ 535               	main:
+ 536               	.LFB17:
+ 537               		.file 3 "desklight.cpp"
+   1:desklight.cpp **** 
+   2:desklight.cpp **** #include "calca.h"
+   3:desklight.cpp **** 
+   4:desklight.cpp **** #include <avr/sleep.h>
+   5:desklight.cpp **** #include <avr/interrupt.h>
+   6:desklight.cpp **** 
+   7:desklight.cpp **** #define PIN_ROTARY1	PB1
+   8:desklight.cpp **** #define PIN_ROTARY2	PB2
+   9:desklight.cpp **** #define PIN_SWITCH	PB3
+  10:desklight.cpp **** 
+  11:desklight.cpp **** #define ROTARY_MASK ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))
+  12:desklight.cpp **** #define SWITCH_MASK (1 << PIN_SWITCH)
+  13:desklight.cpp **** #define EVENT_MASK (ROTARY_MASK | SWITCH_MASK)
+  14:desklight.cpp **** 
+  15:desklight.cpp **** static inline void setup_registers(void)
+  16:desklight.cpp **** {
+  17:desklight.cpp **** 	CCP = 0xD8;		// allow writes to CLKPSR
+  18:desklight.cpp **** 	CLKPSR = 0;		// disable prescaler
+  19:desklight.cpp **** 	CCP = 0xD8;		// allow writes to CLKPSR
+  20:desklight.cpp **** 	CLKMSR = 0x0U;		// select internal 8MHz oscillator
+  21:desklight.cpp **** 
+  22:desklight.cpp **** 	// set sleep-mode to idle
+  23:desklight.cpp **** 	SMCR = 0;
+  24:desklight.cpp **** 
+  25:desklight.cpp **** 	// won't need the Timer0 or ADC
+  26:desklight.cpp **** 	PRR |= (1 << PRADC) | (1 << PRTIM0);
+  27:desklight.cpp **** 
+  28:desklight.cpp **** 	// disable all unneeded digital inputs
+  29:desklight.cpp **** 	DIDR0 = ~EVENT_MASK;
+  30:desklight.cpp **** 
+  31:desklight.cpp **** 	// prepare switch and potentiometer
+  32:desklight.cpp **** 	DDRB &= ~EVENT_MASK;
+  33:desklight.cpp **** 	PUEB = EVENT_MASK;
+  34:desklight.cpp **** 
+  35:desklight.cpp **** 	// enable interrupt for switch and rotary encoder flags
+  36:desklight.cpp **** 	PCICR |= (1 << PCIE0);
+  37:desklight.cpp **** 	PCMSK |= EVENT_MASK;
+  38:desklight.cpp **** }
+  39:desklight.cpp **** 
+  40:desklight.cpp **** int main(void)
+  41:desklight.cpp **** {
+ 538               		.loc 3 41 0
+ 539               		.cfi_startproc
+ 540               	/* prologue: function */
+ 541               	/* frame size = 0 */
+ 542               	/* stack size = 0 */
+ 543               	.L__stack_usage = 0
+ 544               	.LBB46:
+ 545               	.LBB47:
+  17:desklight.cpp **** 	CLKPSR = 0;		// disable prescaler
+ 546               		.loc 3 17 0
+ 547 0000 48ED      		ldi r20,lo8(-40)
+ 548 0002 4CBF      		out __CCP__,r20
+  18:desklight.cpp **** 	CCP = 0xD8;		// allow writes to CLKPSR
+ 549               		.loc 3 18 0
+ 550 0004 16BF      		out 0x36,__zero_reg__
+  19:desklight.cpp **** 	CLKMSR = 0x0U;		// select internal 8MHz oscillator
+ 551               		.loc 3 19 0
+ 552 0006 4CBF      		out __CCP__,r20
+  20:desklight.cpp **** 
+ 553               		.loc 3 20 0
+ 554 0008 17BF      		out 0x37,__zero_reg__
+  23:desklight.cpp **** 
+ 555               		.loc 3 23 0
+ 556 000a 1ABF      		out 0x3a,__zero_reg__
+  26:desklight.cpp **** 
+ 557               		.loc 3 26 0
+ 558 000c 45B7      		in r20,0x35
+ 559 000e 4360      		ori r20,lo8(3)
+ 560 0010 45BF      		out 0x35,r20
+  29:desklight.cpp **** 
+ 561               		.loc 3 29 0
+ 562 0012 41EF      		ldi r20,lo8(-15)
+ 563 0014 47BB      		out 0x17,r20
+  32:desklight.cpp **** 	PUEB = EVENT_MASK;
+ 564               		.loc 3 32 0
+ 565 0016 41B1      		in r20,0x1
+ 566 0018 417F      		andi r20,lo8(-15)
+ 567 001a 41B9      		out 0x1,r20
+  33:desklight.cpp **** 
+ 568               		.loc 3 33 0
+ 569 001c 4EE0      		ldi r20,lo8(14)
+ 570 001e 43B9      		out 0x3,r20
+  36:desklight.cpp **** 	PCMSK |= EVENT_MASK;
+ 571               		.loc 3 36 0
+ 572 0020 909A      		sbi 0x12,0
+  37:desklight.cpp **** }
+ 573               		.loc 3 37 0
+ 574 0022 40B3      		in r20,0x10
+ 575 0024 4E60      		ori r20,lo8(14)
+ 576 0026 40BB      		out 0x10,r20
+ 577               	.LBE47:
+ 578               	.LBE46:
+  42:desklight.cpp **** 	setup_registers();
+  43:desklight.cpp **** 	calca_init(); // activates interrupts
+ 579               		.loc 3 43 0
+ 580 0028 00D0      		rcall _ZL10calca_initv
+ 581               	.LVL59:
+  44:desklight.cpp **** 
+  45:desklight.cpp **** 	uint8_t previous_io = EVENT_MASK;
+ 582               		.loc 3 45 0
+ 583 002a 4EE0      		ldi r20,lo8(14)
+ 584               	.LVL60:
+ 585               	.L23:
+ 586               	.LBB48:
+  46:desklight.cpp **** 
+  47:desklight.cpp **** 	while(1) {
+  48:desklight.cpp **** 		sleep_mode(); // will return once interrupted by ISR.
+ 587               		.loc 3 48 0
+ 588 002c 5AB7      		in r21,0x3a
+ 589 002e 5160      		ori r21,lo8(1)
+ 590 0030 5ABF      		out 0x3a,r21
+ 591               	/* #APP */
+ 592               	 ;  48 "desklight.cpp" 1
+ 593 0032 8895      		sleep
+ 594               		
+ 595               	 ;  0 "" 2
+ 596               	/* #NOAPP */
+ 597 0034 5AB7      		in r21,0x3a
+ 598 0036 5E7F      		andi r21,lo8(-2)
+ 599 0038 5ABF      		out 0x3a,r21
+  49:desklight.cpp **** 
+  50:desklight.cpp **** 		uint8_t current_io = PINB & EVENT_MASK;
+ 600               		.loc 3 50 0
+ 601 003a 50B1      		in r21,0
+ 602 003c C52F      		mov r28,r21
+ 603 003e CE70      		andi r28,lo8(14)
+ 604               	.LVL61:
+  51:desklight.cpp **** 		uint8_t changed_io = (current_io ^ previous_io);
+ 605               		.loc 3 51 0
+ 606 0040 642F      		mov r22,r20
+ 607 0042 6C27      		eor r22,r28
+ 608               	.LVL62:
+  52:desklight.cpp **** 
+  53:desklight.cpp **** 		if((changed_io & ROTARY_MASK) && (0 == (previous_io & ROTARY_MASK))) {
+ 609               		.loc 3 53 0
+ 610 0044 762F      		mov r23,r22
+ 611 0046 7670      		andi r23,lo8(6)
+ 612 0048 01F0      		breq .L24
+ 613               		.loc 3 53 0 is_stmt 0 discriminator 1
+ 614 004a 4670      		andi r20,lo8(6)
+ 615               	.LVL63:
+ 616 004c 01F4      		brne .L24
+  54:desklight.cpp **** 			calca_rotary_step( (current_io & (1 << PIN_ROTARY1)) ? 1 : -1);
+ 617               		.loc 3 54 0 is_stmt 1
+ 618 004e 8FEF      		ldi r24,lo8(-1)
+ 619 0050 51FD      		sbrc r21,1
+ 620 0052 81E0      		ldi r24,lo8(1)
+ 621               	.L25:
+ 622               	.LVL64:
+ 623               	.LBB49:
+ 624               	.LBB50:
+  86:calca.h       **** }
+  87:calca.h       **** 
+  88:calca.h       **** static inline void calca_button(void)
+  89:calca.h       **** {
+  90:calca.h       **** 	calca_mode++;
+  91:calca.h       **** 	calca_mode %= MODECOUNT;
+  92:calca.h       **** }
+  93:calca.h       **** 
+  94:calca.h       **** static int8_t check_bounds(int8_t value, int8_t lower, int8_t higher)
+  95:calca.h       **** {
+  96:calca.h       **** 	return (value < lower) ? lower :
+  97:calca.h       **** 		(value > higher) ? higher :
+  98:calca.h       **** 		value;
+  99:calca.h       **** }
+ 100:calca.h       **** 
+ 101:calca.h       **** static inline void calca_rotary_step(int8_t dir)
+ 102:calca.h       **** {
+ 103:calca.h       **** 	switch(calca_mode) {
+ 625               		.loc 2 103 0 discriminator 4
+ 626 0054 40A0      		lds r20,_ZL10calca_mode
+ 627 0056 4130      		cpi r20,lo8(1)
+ 628 0058 01F0      		breq .L27
+ 629 005a 00F0      		brlo .L28
+ 630 005c 60A0      		lds r22,light_count
+ 631               	.LVL65:
+ 632 005e 4230      		cpi r20,lo8(2)
+ 633 0060 01F0      		breq .L29
+ 104:calca.h       **** 		case MODE_ATTENUATION:
+ 105:calca.h       **** 			calca_attenuation = check_bounds(calca_attenuation + dir, 0, MAX_ATTENUATION);
+ 106:calca.h       **** 			break;
+ 107:calca.h       **** 		case MODE_COLOR:
+ 108:calca.h       **** 			calca_color += dir;
+ 109:calca.h       **** 			break;
+ 110:calca.h       **** 		case MODE_SPOTWIDTH:
+ 111:calca.h       **** 			calca_width = check_bounds(calca_width + dir, 1, light_count);
+ 112:calca.h       **** 			break;
+ 113:calca.h       **** 		default:
+ 114:calca.h       **** 		case MODE_SPOTPOS:
+ 115:calca.h       **** 			calca_pos = (calca_pos + dir + light_count) % light_count;
+ 634               		.loc 2 115 0
+ 635 0062 062F      		mov __tmp_reg__,r22
+ 636 0064 000F      		lsl r16
+ 637 0066 770B      		sbc r23,r23
+ 638 0068 40A0      		lds r20,_ZL9calca_pos
+ 639 006a 082F      		mov __tmp_reg__,r24
+ 640 006c 000F      		lsl r16
+ 641 006e 990B      		sbc r25,r25
+ 642 0070 840F      		add r24,r20
+ 643 0072 911F      		adc r25,__zero_reg__
+ 644 0074 47FD      		sbrc r20,7
+ 645 0076 9A95      		dec r25
+ 646               	.LVL66:
+ 647 0078 860F      		add r24,r22
+ 648 007a 971F      		adc r25,r23
+ 649 007c 00D0      		rcall __divmodhi4
+ 650 007e 80A8      		sts _ZL9calca_pos,r24
+ 651 0080 00C0      		rjmp .L32
+ 652               	.LVL67:
+ 653               	.L28:
+ 105:calca.h       **** 			break;
+ 654               		.loc 2 105 0
+ 655 0082 40A0      		lds r20,_ZL17calca_attenuation
+ 656 0084 840F      		add r24,r20
+ 657               	.LVL68:
+ 658 0086 8633      		cpi r24,lo8(54)
+ 659 0088 04F0      		brlt .L30
+ 660 008a 85E3      		ldi r24,lo8(53)
+ 661               	.L30:
+ 662 008c 87FD      		sbrc r24,7
+ 663 008e 80E0      		ldi r24,0
+ 664               	.L31:
+ 665 0090 80A8      		sts _ZL17calca_attenuation,r24
+ 666               	.LVL69:
+ 667               	.L32:
+ 116:calca.h       **** 			break;
+ 117:calca.h       **** 	};
+ 118:calca.h       **** 
+ 119:calca.h       **** 	calca_set_new_values();
+ 668               		.loc 2 119 0
+ 669 0092 00D0      		rcall _ZL20calca_set_new_valuesv
+ 670               	.LVL70:
+ 671               	.L35:
+ 672               	.LBE50:
+ 673               	.LBE49:
+ 674               	.LBE48:
+  41:desklight.cpp **** 	setup_registers();
+ 675               		.loc 3 41 0
+ 676 0094 4C2F      		mov r20,r28
+ 677 0096 00C0      		rjmp .L23
+ 678               	.LVL71:
+ 679               	.L27:
+ 680               	.LBB59:
+ 681               	.LBB56:
+ 682               	.LBB55:
+ 108:calca.h       **** 			break;
+ 683               		.loc 2 108 0
+ 684 0098 40A0      		lds r20,_ZL11calca_color
+ 685 009a 840F      		add r24,r20
+ 686               	.LVL72:
+ 687 009c 80A8      		sts _ZL11calca_color,r24
+ 688 009e 00C0      		rjmp .L32
+ 689               	.LVL73:
+ 690               	.L29:
+ 111:calca.h       **** 			break;
+ 691               		.loc 2 111 0
+ 692 00a0 40A0      		lds r20,_ZL11calca_width
+ 693 00a2 840F      		add r24,r20
+ 694               	.LVL74:
+ 695               	.LBB51:
+ 696               	.LBB52:
+  96:calca.h       **** 		(value > higher) ? higher :
+ 697               		.loc 2 96 0
+ 698 00a4 1817      		cp __zero_reg__,r24
+ 699 00a6 04F4      		brge .L39
+ 700 00a8 8617      		cp r24,r22
+ 701 00aa 04F4      		brge .L33
+ 702 00ac 682F      		mov r22,r24
+ 703               	.LVL75:
+ 704               	.L33:
+ 705               	.LBE52:
+ 706               	.LBE51:
+ 111:calca.h       **** 			break;
+ 707               		.loc 2 111 0
+ 708 00ae 60A8      		sts _ZL11calca_width,r22
+ 709 00b0 00C0      		rjmp .L32
+ 710               	.LVL76:
+ 711               	.L39:
+ 712               	.LBB54:
+ 713               	.LBB53:
+  96:calca.h       **** 		(value > higher) ? higher :
+ 714               		.loc 2 96 0
+ 715 00b2 61E0      		ldi r22,lo8(1)
+ 716               	.LVL77:
+ 717 00b4 00C0      		rjmp .L33
+ 718               	.LVL78:
+ 719               	.L24:
+ 720               	.LBE53:
+ 721               	.LBE54:
+ 722               	.LBE55:
+ 723               	.LBE56:
+  55:desklight.cpp **** 		} else if(changed_io & SWITCH_MASK) {
+ 724               		.loc 3 55 0
+ 725 00b6 63FF      		sbrs r22,3
+ 726 00b8 00C0      		rjmp .L35
+  56:desklight.cpp **** 			if(!(current_io & SWITCH_MASK)) {
+ 727               		.loc 3 56 0
+ 728 00ba 53FD      		sbrc r21,3
+ 729 00bc 00C0      		rjmp .L36
+ 730               	.LBB57:
+ 731               	.LBB58:
+  90:calca.h       **** 	calca_mode %= MODECOUNT;
+ 732               		.loc 2 90 0
+ 733 00be 40A0      		lds r20,_ZL10calca_mode
+ 734 00c0 4F5F      		subi r20,lo8(-(1))
+  91:calca.h       **** }
+ 735               		.loc 2 91 0
+ 736 00c2 4370      		andi r20,lo8(3)
+ 737 00c4 40A8      		sts _ZL10calca_mode,r20
+ 738               	.LBE58:
+ 739               	.LBE57:
+  57:desklight.cpp **** 				// switch push-down event
+  58:desklight.cpp **** 				calca_button();
+  59:desklight.cpp **** 				// start timer0 for measurement of time
+  60:desklight.cpp **** 				// until button-release
+  61:desklight.cpp **** 				PRR &= ~(1 << PRTIM0);
+ 740               		.loc 3 61 0
+ 741 00c6 45B7      		in r20,0x35
+ 742 00c8 4E7F      		andi r20,lo8(-2)
+ 743 00ca 45BF      		out 0x35,r20
+  62:desklight.cpp **** 				TCCR0A = 0;
+ 744               		.loc 3 62 0
+ 745 00cc 1EBD      		out 0x2e,__zero_reg__
+  63:desklight.cpp **** 				TCCR0C = 0;
+ 746               		.loc 3 63 0
+ 747 00ce 1CBD      		out 0x2c,__zero_reg__
+  64:desklight.cpp **** 				TCCR0B = 0x5; // TimerCLK is IoCLK/1024
+ 748               		.loc 3 64 0
+ 749 00d0 45E0      		ldi r20,lo8(5)
+ 750 00d2 4DBD      		out 0x2d,r20
+  65:desklight.cpp **** 				TCNT0 = 0;
+ 751               		.loc 3 65 0
+ 752 00d4 19BD      		out 0x28+1,__zero_reg__
+ 753 00d6 18BD      		out 0x28,__zero_reg__
+ 754 00d8 00C0      		rjmp .L35
+ 755               	.L36:
+  66:desklight.cpp **** 			} else {
+  67:desklight.cpp **** 				// switch release event
+  68:desklight.cpp **** 				if(TCNT0 > 2604) // pressed for more than ~1/3 second
+ 756               		.loc 3 68 0
+ 757 00da 48B5      		in r20,0x28
+ 758 00dc 59B5      		in r21,0x28+1
+ 759 00de 4D32      		cpi r20,45
+ 760 00e0 5A40      		sbci r21,10
+ 761               	.LVL79:
+ 762 00e2 00F0      		brlo .L37
+  69:desklight.cpp **** 					calca_init();
+ 763               		.loc 3 69 0
+ 764 00e4 00D0      		rcall _ZL10calca_initv
+ 765               	.LVL80:
+ 766               	.L37:
+  70:desklight.cpp **** 				PRR |= (1 << PRTIM0);
+ 767               		.loc 3 70 0
+ 768 00e6 45B7      		in r20,0x35
+ 769 00e8 4160      		ori r20,lo8(1)
+ 770 00ea 45BF      		out 0x35,r20
+ 771 00ec 00C0      		rjmp .L35
+ 772               	.LBE59:
+ 773               		.cfi_endproc
+ 774               	.LFE17:
+ 776               		.text
+ 777               	.global	__vector_2
+ 779               	__vector_2:
+ 780               	.LFB18:
+  71:desklight.cpp **** 			}
+  72:desklight.cpp **** 		}
+  73:desklight.cpp **** 
+  74:desklight.cpp **** 		previous_io = current_io;
+  75:desklight.cpp **** 	}
+  76:desklight.cpp **** }
+  77:desklight.cpp **** 
+  78:desklight.cpp **** ISR(PCINT0_vect)
+  79:desklight.cpp **** { /* this just pulls us out of sleep mode */ }
+ 781               		.loc 3 79 0
+ 782               		.cfi_startproc
+ 783 022e 1F93      		push r17
+ 784               		.cfi_def_cfa_offset 3
+ 785               		.cfi_offset 17, -2
+ 786 0230 0F93      		push r16
+ 787               		.cfi_def_cfa_offset 4
+ 788               		.cfi_offset 16, -3
+ 789 0232 0FB7      		in r16,__SREG__
+ 790 0234 0F93      		push r16
+ 791 0236 10E0      		ldi __zero_reg__,0
+ 792               	/* prologue: Signal */
+ 793               	/* frame size = 0 */
+ 794               	/* stack size = 3 */
+ 795               	.L__stack_usage = 3
+ 796               	/* epilogue start */
+ 797               		.loc 3 79 0
+ 798 0238 0F91      		pop r16
+ 799 023a 0FBF      		out __SREG__,r16
+ 800 023c 0F91      		pop r16
+ 801 023e 1F91      		pop r17
+ 802 0240 1895      		reti
+ 803               		.cfi_endproc
+ 804               	.LFE18:
+ 806               		.local	_ZL11calca_width
+ 807               		.comm	_ZL11calca_width,1,1
+ 808               		.local	_ZL9calca_pos
+ 809               		.comm	_ZL9calca_pos,1,1
+ 810               		.local	_ZL17calca_attenuation
+ 811               		.comm	_ZL17calca_attenuation,1,1
+ 812               		.local	_ZL11calca_color
+ 813               		.comm	_ZL11calca_color,1,1
+ 814               		.local	_ZL10calca_mode
+ 815               		.comm	_ZL10calca_mode,1,1
+ 816               	.global	light_count
+ 817               		.section .bss
+ 820               	light_count:
+ 821 0000 00        		.zero	1
+ 822               		.text
+ 823               	.Letext0:
+ 824               		.file 4 "/usr/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 desklight.cpp
+     /tmp/ccCrb7BK.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccCrb7BK.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccCrb7BK.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccCrb7BK.s:5      *ABS*:000000000000003c __CCP__
+     /tmp/ccCrb7BK.s:6      *ABS*:0000000000000010 __tmp_reg__
+     /tmp/ccCrb7BK.s:7      *ABS*:0000000000000011 __zero_reg__
+     /tmp/ccCrb7BK.s:12     .text:0000000000000000 _ZL23ws2812_send_single_byteh
+     /tmp/ccCrb7BK.s:74     .text:0000000000000028 _ZL22get_channel_brightnesshh
+     /tmp/ccCrb7BK.s:135    .text:0000000000000052 _ZL20calca_set_new_valuesv
+     /tmp/ccCrb7BK.s:809    .bss:0000000000000003 _ZL17calca_attenuation
+     /tmp/ccCrb7BK.s:811    .bss:0000000000000004 _ZL11calca_color
+     /tmp/ccCrb7BK.s:807    .bss:0000000000000002 _ZL9calca_pos
+                             .bss:0000000000000001 _ZL11calca_width
+     /tmp/ccCrb7BK.s:820    .bss:0000000000000000 light_count
+     /tmp/ccCrb7BK.s:496    .text:0000000000000216 _ZL10calca_initv
+     /tmp/ccCrb7BK.s:813    .bss:0000000000000005 _ZL10calca_mode
+     /tmp/ccCrb7BK.s:535    .text.startup:0000000000000000 main
+     /tmp/ccCrb7BK.s:779    .text:000000000000022e __vector_2
+
+UNDEFINED SYMBOLS
+__mulhi3
+__divmodhi4
+__do_clear_bss
