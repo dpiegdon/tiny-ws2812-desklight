@@ -8,9 +8,9 @@
 #define PIN_ROTARY2	PB2
 #define PIN_SWITCH	PB3
 
-static const uint8_t rotary_mask = ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2));
-static const uint8_t switch_mask = (1 << PIN_SWITCH);
-static const uint8_t event_mask = rotary_mask | switch_mask;
+#define ROTARY_MASK ((1 << PIN_ROTARY1) | ( 1 << PIN_ROTARY2))
+#define SWITCH_MASK (1 << PIN_SWITCH)
+#define EVENT_MASK (ROTARY_MASK | SWITCH_MASK)
 
 static inline void setup_registers(void)
 {
@@ -26,15 +26,15 @@ static inline void setup_registers(void)
 	PRR |= (1 << PRADC) | (1 << PRTIM0);
 
 	// disable all unneeded digital inputs
-	DIDR0 = ~event_mask;
+	DIDR0 = ~EVENT_MASK;
 
 	// prepare switch and potentiometer
-	DDRB &= ~event_mask;
-	PUEB = event_mask;
+	DDRB &= ~EVENT_MASK;
+	PUEB = EVENT_MASK;
 
 	// enable interrupt for switch and rotary encoder flags
 	PCICR |= (1 << PCIE0);
-	PCMSK |= event_mask;
+	PCMSK |= EVENT_MASK;
 }
 
 int main(void)
@@ -42,18 +42,18 @@ int main(void)
 	setup_registers();
 	calca_init(); // activates interrupts
 
-	uint8_t previous_io = event_mask;
+	uint8_t previous_io = EVENT_MASK;
 
 	while(1) {
 		sleep_mode(); // will return once interrupted by ISR.
 
-		uint8_t current_io = PINB & event_mask;
+		uint8_t current_io = PINB & EVENT_MASK;
 		uint8_t changed_io = (current_io ^ previous_io);
 
-		if((changed_io & rotary_mask) && (0 == (previous_io & rotary_mask))) {
+		if((changed_io & ROTARY_MASK) && (0 == (previous_io & ROTARY_MASK))) {
 			calca_rotary_step( (current_io & (1 << PIN_ROTARY1)) ? 1 : -1);
-		} else if(changed_io & switch_mask) {
-			if(!(current_io & switch_mask)) {
+		} else if(changed_io & SWITCH_MASK) {
+			if(!(current_io & SWITCH_MASK)) {
 				// switch push-down event
 				calca_button();
 				// start timer0 for measurement of time
