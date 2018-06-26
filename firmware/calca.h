@@ -47,7 +47,6 @@ static void calca_set_new_values(void)
 	uint8_t g = get_channel_brightness(calca_color >> 2, calca_attenuation);
 	uint8_t b = get_channel_brightness(calca_color >> 4, calca_attenuation);
 
-	int8_t count;
 	int8_t calca_offpos = calca_pos + calca_width;
 	int8_t head_on = (calca_offpos > light_count) ? (calca_offpos % light_count) : 0;
 	int8_t head_off = calca_pos - head_on;
@@ -56,16 +55,18 @@ static void calca_set_new_values(void)
 
 	cli();
 	{
-		for(count = head_on; count > 0; --count)
+		int8_t i;
+
+		for(i = head_on; i > 0; --i)
 			ws2812_set_single(r, g, b);
 
-		for(count = head_off; count > 0; --count)
+		for(i = head_off; i > 0; --i)
 			ws2812_set_single(0, 0, 0);
 
-		for(count = tail_on; count > 0; --count)
+		for(i = tail_on; i > 0; --i)
 			ws2812_set_single(r, g, b);
 
-		for(count = tail_off; count > 0; --count)
+		for(i = tail_off; i > 0; --i)
 			ws2812_set_single(0, 0, 0);
 	}
 	sei();
