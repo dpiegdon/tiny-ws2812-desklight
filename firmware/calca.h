@@ -49,10 +49,10 @@ static void calca_set_new_values(void)
 
 	int8_t count;
 	int8_t calca_offpos = calca_pos + calca_width;
-	int8_t head_on = (calca_offpos > LIGHT_COUNT) ? (calca_offpos % LIGHT_COUNT) : 0;
+	int8_t head_on = (calca_offpos > light_count) ? (calca_offpos % light_count) : 0;
 	int8_t head_off = calca_pos - head_on;
 	int8_t tail_on = calca_width - head_on;
-	int8_t tail_off = LIGHT_COUNT - head_on - head_off - tail_on;
+	int8_t tail_off = light_count - head_on - head_off - tail_on;
 
 	cli();
 	{
@@ -79,7 +79,7 @@ static void calca_init(void)
 	calca_color = 0x3;
 	calca_attenuation = MAX_ATTENUATION-1;
 	calca_pos = 0;
-	calca_width = LIGHT_COUNT;
+	calca_width = light_count;
 
 	calca_set_new_values();
 }
@@ -107,11 +107,11 @@ static inline void calca_rotary_step(int8_t dir)
 			calca_color += dir;
 			break;
 		case MODE_SPOTWIDTH:
-			calca_width = check_bounds(calca_width + dir, 1, LIGHT_COUNT);
+			calca_width = check_bounds(calca_width + dir, 1, light_count);
 			break;
 		default:
 		case MODE_SPOTPOS:
-			calca_pos = (calca_pos + dir + LIGHT_COUNT) % LIGHT_COUNT;
+			calca_pos = (calca_pos + dir + light_count) % light_count;
 			break;
 	};
 
