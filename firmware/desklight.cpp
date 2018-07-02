@@ -56,7 +56,7 @@ int main(void)
 				calca_button();
 				// start timer0 for measurement of time
 				// until button-release
-				PRR = (3 << PRTIM0);
+				PRR = (1 << PRADC);
 				TCCR0A = 0;
 				TCCR0C = 0;
 				TCCR0B = 0x5; // TimerCLK is IoCLK/1024
