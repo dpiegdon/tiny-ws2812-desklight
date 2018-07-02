@@ -15,15 +15,13 @@
 static inline void setup_registers(void)
 {
 	CCP = 0xD8;		// allow writes to CLKPSR
-	CLKPSR = 0;		// disable prescaler
-	CCP = 0xD8;		// allow writes to CLKPSR
-	CLKMSR = 0x0U;		// select internal 8MHz oscillator
+	CLKPSR = 0;		// disable system clock prescaler
 
 	// set sleep-mode to idle
 	SMCR = 0;
 
 	// won't need the Timer0 or ADC
-	PRR |= (1 << PRADC) | (1 << PRTIM0);
+	PRR = (1 << PRADC) | (1 << PRTIM0);
 
 	// disable all unneeded digital inputs
 	DIDR0 = ~EVENT_MASK;
@@ -58,7 +56,7 @@ int main(void)
 				calca_button();
 				// start timer0 for measurement of time
 				// until button-release
-				PRR &= ~(1 << PRTIM0);
+				PRR = (3 << PRTIM0);
 				TCCR0A = 0;
 				TCCR0C = 0;
 				TCCR0B = 0x5; // TimerCLK is IoCLK/1024
@@ -67,7 +65,7 @@ int main(void)
 				// switch release event
 				if(TCNT0 > 2604) // pressed for more than ~1/3 second
 					calca_init();
-				PRR |= (1 << PRTIM0);
+				PRR = (1 << PRADC) | (1 << PRTIM0);
 			}
 		}
 

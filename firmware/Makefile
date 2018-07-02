@@ -47,7 +47,7 @@ AVRDUDE_OPTS := -c ${PROGRAMMER_ID} -P ${PORT} -p ${PARTNO}
 
 ###
 
-.PHONY: all desklight readfuses fuses_desklight prog_flash_desklight prog_eeprom_desklight erase clean
+.PHONY: all desklight readfuses flash erase clean
 
 all:	desklight
 
@@ -56,14 +56,9 @@ desklight:	desklight.asm desklight.hex desklight.eep desklight.bin
 readfuses:
 	avrdude ${AVRDUDE_OPTS} -Ulfuse:r:fuse_low.hex:h -U hfuse:r:fuse_high.hex:h
 
-fuses_desklight:
-	avrdude ${AVRDUDE_OPTS} -U fuse:w:0xFE:m
-
-prog_flash_desklight: desklight.hex fuses_desklight
+flash: desklight.hex
 	avrdude ${AVRDUDE_OPTS} -U flash:w:desklight.hex
-
-prog_eeprom_desklight: desklight.eep
-	avrdude ${AVRDUDE_OPTS} -U eeprom:w:desklight.eep
+	avrdude ${AVRDUDE_OPTS} -U fuse:w:0xFE:m
 
 erase:
 	avrdude ${AVRDUDE_OPTS} -e
