@@ -467,12 +467,4 @@ Wire Wire Line
 	3650 3900 5600 3900
 Wire Wire Line
 	5900 3900 7100 3900
-Wire Notes Line
-	5550 3850 5550 4300
-Wire Notes Line
-	5550 4300 6700 4300
-Wire Notes Line
-	6700 4300 6700 3850
-Text Notes 5600 4250 0    39   ~ 0
-unsure about resistor value.\n1k is a guess.
 $EndSCHEMATC
