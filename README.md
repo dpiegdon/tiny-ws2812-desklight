@@ -10,6 +10,11 @@ and a digital encoder for color/brightness selection.
 Controls a strip of WS2812 RGB LEDs which could e.g. be mounted at the bottom
 edge of your desktop monitor facing down towards the desk surface.
 
+![PCB v1.0 bottom side photo](
+https://github.com/dpiegdon/tiny-ws2812-desklight/blob/master/hardware/production/tiny-ws2812-desklight-v1.0_bottom-pcb.jpg?raw=true)
+
+(Above: bottom side of v1.0 PCB)
+
 
 Authors
 -------
