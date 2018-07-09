@@ -9,7 +9,7 @@
 
 #define PIN_LED PB0
 
-#define LIGHT_COUNT 34
+#define LIGHT_COUNT 126
 uint8_t light_count;
 
 static inline void ws2812_init(void)
@@ -18,36 +18,47 @@ static inline void ws2812_init(void)
 	DDRB |= (1 << PIN_LED);
 }
 
-static inline void ws2812_send_single_byte(uint8_t byte)
-{
-	for(uint8_t mask = 0x80; mask != 0; mask >>= 1) {
-		if(byte & mask) {
-			__asm__ __volatile__("sbi %0, %1 \n\t"
-					     "nop \n\t"
-					     "nop \n\t"
-					     "nop \n\t"
-					     "cbi %0, %1 \n\t"
-					     :
-					     : "i" (0x2), "i" (PIN_LED)
-					     :
-					);
-		} else {
-			__asm__ __volatile__("sbi %0, %1 \n\t"
-					     "nop \n\t"
-					     "cbi %0, %1 \n\t"
-					     :
-					     : "i" (0x2), "i" (PIN_LED)
-					     :
-					);
-		}
-	}
-}
-
 static inline void ws2812_set_single(uint8_t r, uint8_t g, uint8_t b)
 {
-	ws2812_send_single_byte(g);
-	ws2812_send_single_byte(r);
-	ws2812_send_single_byte(b);
+	if(r || g || b) {
+		__asm__ __volatile__("sbi %0, %1 \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "cbi %0, %1 \n\t"
+				     :
+				     : "i" (0x2), "i" (PIN_LED)
+				     :
+				);
+	} else {
+		__asm__ __volatile__("cbi %0, %1 \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "nop \n\t"
+
+				     "nop \n\t"
+				     "nop \n\t"
+
+				     "sbi %0, %1 \n\t"
+				     "cbi %0, %1 \n\t"
+				     :
+				     : "i" (0x2), "i" (PIN_LED)
+				     :
+				);
+	}
 }
 
 #endif // __WS2812_H__
