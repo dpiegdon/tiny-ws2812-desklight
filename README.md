@@ -82,9 +82,13 @@ size-constraints.
 
 Improved binary size. Now supports building with GCC 5.4.0.
 
-### master
+### v1.2
 
 Support up to 126 LEDs.
+
+### master
+
+(no more changes)
 
 Hardware
 ========
