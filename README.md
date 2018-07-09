@@ -63,8 +63,8 @@ If you want to change the number of lights in the firmware, please do so in
 to `light_count` in the firmware files (in `ws2812_init()`, `calca_init()`, if
 you don't want to recompile.)
 
-Note that you can not use more than 63 lights. The actual constraint is
-something like `2 * lightcount + 1 <= max_value(int8_t)`.
+Note that you can not use more than 126 LEDs. The actual constraint is something
+like `lightcount <= max_value(int8_t)-1`.
 
 
 Hardware

@@ -100,8 +100,13 @@ static int8_t check_bounds(int8_t value, int8_t lower, int8_t higher)
 		value;
 }
 
+#if LIGHT_COUNT > 126
+# error Only <= 126 lights are supported
+#endif
+
 static inline void calca_rotary_step(int8_t dir)
 {
+
 	switch(calca_mode) {
 		case MODE_ATTENUATION:
 			calca_attenuation = check_bounds(calca_attenuation + dir, 0, MAX_ATTENUATION);
@@ -114,7 +119,13 @@ static inline void calca_rotary_step(int8_t dir)
 			break;
 		default:
 		case MODE_SPOTPOS:
-			calca_pos = uint8_t(calca_pos + dir + light_count) % light_count;
+			int16_t new_pos;
+			new_pos = calca_pos;
+			new_pos += light_count;
+			new_pos += dir;
+			while(new_pos > light_count)
+				new_pos -= light_count;
+			calca_pos = new_pos;
 			break;
 	};
 
