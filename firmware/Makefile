@@ -41,8 +41,9 @@ LDFLAGS += -Wl,--cref,-Map=$(@:%.elf=%.map)
 ###
 
 # NOTE: attiny4/5/9/10 need TPI-capable programmer. STK500 will not work.
-PROGRAMMER_ID := avrispmkII
-PORT := usb
+# But usbasp and avrispmkII work.
+PROGRAMMER_ID ?= usbasp
+PORT ?= usb
 AVRDUDE_OPTS := -c ${PROGRAMMER_ID} -P ${PORT} -p ${PARTNO}
 
 ###
