@@ -109,7 +109,7 @@ static inline void calca_rotary_step(int8_t dir)
 
 	switch(calca_mode) {
 		case MODE_ATTENUATION:
-			calca_attenuation = check_bounds(calca_attenuation + dir, 0, MAX_ATTENUATION);
+			calca_attenuation = check_bounds(calca_attenuation - dir, 0, MAX_ATTENUATION);
 			break;
 		case MODE_COLOR:
 			calca_color += dir;

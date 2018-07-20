@@ -49,7 +49,7 @@ int main(void)
 		uint8_t changed_io = (current_io ^ previous_io);
 
 		if((changed_io & ROTARY_MASK) && (0 == (previous_io & ROTARY_MASK))) {
-			calca_rotary_step( (current_io & (1 << PIN_ROTARY1)) ? 1 : -1);
+			calca_rotary_step( (current_io & (1 << PIN_ROTARY2)) ? 1 : -1);
 		} else if(changed_io & SWITCH_MASK) {
 			if(!(current_io & SWITCH_MASK)) {
 				// switch push-down event
