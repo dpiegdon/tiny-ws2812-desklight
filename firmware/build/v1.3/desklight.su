@@ -1,0 +1,6 @@
+ws2812.h:21:20:void ws2812_send_single_byte(uint8_t)	2	static
+calca.h:24:16:uint8_t get_channel_brightness(uint8_t, uint8_t)	2	static
+calca.h:46:13:void calca_set_new_values()	12	static
+calca.h:77:13:void calca_init()	2	static
+desklight.cpp:38:5:int main()	2	static
+desklight.cpp:76:1:void __vector_2()	5	static

@@ -86,6 +86,10 @@ Improved binary size. Now supports building with GCC 5.4.0.
 
 Support up to 126 LEDs.
 
+### v1.3
+
+Fixed rotary dial directions to be consistent across modes.
+
 ### master
 
 (no more changes)
