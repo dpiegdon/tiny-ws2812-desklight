@@ -90,6 +90,11 @@ Support up to 126 LEDs.
 
 Fixed rotary dial directions to be consistent across modes.
 
+### v1.4
+
+Fixed WS2812 timings to properly work with all LEDs. Allow `LIGHT_COUNT` to be
+overriden via `CXXFLAGS`.
+
 ### master
 
 (no more changes)
