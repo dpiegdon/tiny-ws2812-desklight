@@ -43,6 +43,8 @@ static int8_t calca_attenuation;
 static uint8_t calca_pos;
 static uint8_t calca_width;
 
+static uint8_t light_count;
+
 static void calca_set_new_values(void)
 {
 	uint8_t r = get_channel_brightness(calca_color >> 0, calca_attenuation);
@@ -74,8 +76,16 @@ static void calca_set_new_values(void)
 	sei();
 }
 
+#ifndef LIGHT_COUNT
+# define LIGHT_COUNT 34
+#endif
+#if LIGHT_COUNT > 126
+# error Only <= 126 lights are supported
+#endif
+
 static void calca_init(void)
 {
+	light_count = LIGHT_COUNT;
 	ws2812_init();
 
 	calca_mode = MODE_ATTENUATION;
@@ -99,10 +109,6 @@ static int8_t check_bounds(int8_t value, int8_t lower, int8_t higher)
 		(value > higher) ? higher :
 		value;
 }
-
-#if LIGHT_COUNT > 126
-# error Only <= 126 lights are supported
-#endif
 
 static inline void calca_rotary_step(int8_t dir)
 {
