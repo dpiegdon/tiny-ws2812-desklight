@@ -26,6 +26,8 @@ static inline void ws2812_send_single_byte(uint8_t byte)
 					     "nop \n\t"
 					     "nop \n\t"
 					     "nop \n\t"
+					     "nop \n\t"
+					     "nop \n\t"
 					     "cbi %0, %1 \n\t"
 					     :
 					     : "i" (0x2), "i" (PIN_LED)
@@ -35,6 +37,8 @@ static inline void ws2812_send_single_byte(uint8_t byte)
 			__asm__ __volatile__("sbi %0, %1 \n\t"
 					     "nop \n\t"
 					     "cbi %0, %1 \n\t"
+					     "nop \n\t"
+					     "nop \n\t"
 					     :
 					     : "i" (0x2), "i" (PIN_LED)
 					     :
