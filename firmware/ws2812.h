@@ -8,6 +8,7 @@
 #include <util/delay.h>
 
 #define PIN_LED PB0
+#define PORT_LED ((&PORTB)-__SFR_OFFSET)
 
 static inline void ws2812_init(void)
 {
@@ -26,7 +27,7 @@ static inline void ws2812_send_single_byte(uint8_t byte)
 					     "nop \n\t"
 					     "cbi %0, %1 \n\t"
 					     :
-					     : "i" (0x2), "i" (PIN_LED)
+					     : "i" (PORT_LED), "i" (PIN_LED)
 					     :
 					);
 		} else {
@@ -36,7 +37,7 @@ static inline void ws2812_send_single_byte(uint8_t byte)
 					     "nop \n\t"
 					     "nop \n\t"
 					     :
-					     : "i" (0x2), "i" (PIN_LED)
+					     : "i" (PORT_LED), "i" (PIN_LED)
 					     :
 					);
 		}
