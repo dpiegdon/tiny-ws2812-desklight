@@ -1,4 +1,7 @@
 README.html
+hardware/~*
+hardware/fp-info-cache
+hardware/*-backups
 hardware/*.bck
 hardware/*.bak
 hardware/*.kicad_pcb-bak
@@ -17,3 +20,4 @@ firmware/emulated_*
 */*.swp
 */.swp
 .swp
+.*.swp

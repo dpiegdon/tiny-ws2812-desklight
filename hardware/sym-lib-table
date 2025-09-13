@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 0)
+  (lib (name "desklight-rescue")(type "Legacy")(uri "${KIPRJMOD}/desklight-rescue.lib")(options "")(descr ""))
+)
